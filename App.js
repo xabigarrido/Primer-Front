@@ -1,20 +1,29 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { store } from "./app/store";
+import { Provider } from "react-redux";
+import MyStackNavigator from "./components/MyStackNavigator";
+import { View, Platform, Text } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import "react-native-gesture-handler";
+import { getStatusBarHeight } from "react-native-status-bar-height";
+import CrearComanda from './screens/CrearComandav2'
 
-export default function App() {
+const App = () => {
+  console.log(Platform.OS);
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <View style={{ flex: 1, backgroundColor: "black" }}>
+        <View style={{ flex: 1, marginTop: getStatusBarHeight() }}>
+          <StatusBar style="light" />
+          {Platform.OS !== "web" ? (
+            <MyStackNavigator />
+          ) : (
+            <CrearComanda />
+          )}
+        </View>
+      </View>
+    </Provider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
