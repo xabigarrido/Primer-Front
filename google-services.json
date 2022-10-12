@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "531442077986",
+    "project_id": "noti-pico",
+    "storage_bucket": "noti-pico.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:531442077986:android:daea58060fc81f11c5d57b",
+        "android_client_info": {
+          "package_name": "com.la.piconera"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "531442077986-e269odolehcfgo94c5k2nobcn96j6n47.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.la.piconera",
+            "certificate_hash": "f6285932e1a1d683dc66fe206df9556d0e186169"
+          }
+        },
+        {
+          "client_id": "531442077986-ico04as3v4kdusn5cc0ph2u5s5rrhu53.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDESIWqAkDzA4F_th0S5uCB8bD_AVZ0I2Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "531442077986-ico04as3v4kdusn5cc0ph2u5s5rrhu53.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

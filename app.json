@@ -1,15 +1,22 @@
 {
   "expo": {
-    "name": "clientev2",
+    "name": "La Piconera",
     "plugins": [
       [
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#ffffff"
+        }
       ]
     ],
-    "slug": "clientev2",
+    "slug": "lapiconera",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,7 +24,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -26,16 +33,32 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.la.piconera"
     },
     "android": {
+      "package":"com.la.piconera",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      }
+        "backgroundColor": "#000000"
+      },
+      "googleServicesFile": "./google-services.json",
+      "config":{
+        "googleMaps": {
+          "apiKey":"AIzaSyDqbq6VgOCwCHr2VRPE5ntq2mwSFEkEu5o"
+        }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO","ACCESS_COARSE_LOCATION","ACCESS_FINE_LOCATION","ACCESS_BACKGROUND_LOCATION","android.permission.ACCESS_COARSE_LOCATION","android.permission.ACCESS_FINE_LOCATION","android.permission.ACCESS_BACKGROUND_LOCATION","","android.permission.NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED","RECEIVE_BOOT_COMPLETED","NOTIFICATIONS","android.permission.POST_NOTIFICATIONS","android.permission.ACCESS_MEDIA_LOCATION","ACCESS_MEDIA_LOCATION","ACCESS_NOTIFICATION_POLICY","android.permission.ACCESS_NOTIFICATION_POLICY"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "544d38e5-80be-420c-b4a0-40a2c65ac289"
+      }
     }
   }
 }

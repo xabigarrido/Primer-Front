@@ -12,6 +12,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import TikadaScreen from "../screens/TikadaScreen";
 import PickMesasScreen from "../screens/PickMesaScreen";
+import AbrirCaja from "../screens/HomeCajas";
+import ListaCajasFinales from "../screens/ListaCajasFinales";
+import CajaFinalStatus from "../screens/CajaFinalStatus";
+import CajaFinalStatusId from "../screens/CajaFinalStatusId";
+import GestionEmpresaScreen from "../screens/GestionEmpresaScreen";
+import TikadasEmpleadoById from "../screens/TikadasEmpleadosById";
+import GestionEmpleadosScreen from "../screens/GestionEmpleadosScreen";
 
 const MyStackNavigator = () => {
   const MyStack = () => {
@@ -98,6 +105,41 @@ const MyStackNavigator = () => {
           <Stack.Screen
             name="TikadaScreen"
             component={TikadaScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="AbrirCaja"
+            component={AbrirCaja}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ListaCajasFinales"
+            component={ListaCajasFinales}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="CajaFinalStatus"
+            component={CajaFinalStatus}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="CajaFinalStatusId"
+            component={CajaFinalStatusId}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="GestionEmpresaScreen"
+            component={GestionEmpresaScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="TikadasEmpleadoById"
+            component={TikadasEmpleadoById}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="GestionEmpleadosScreen"
+            component={GestionEmpleadosScreen}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

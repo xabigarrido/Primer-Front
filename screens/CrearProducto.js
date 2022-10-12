@@ -13,6 +13,8 @@ import { Picker } from "@react-native-picker/picker";
 import { TextInput, Button } from "@react-native-material/core";
 import { API } from "../api";
 import fondo from "../assets/fondoScreen.jpg";
+import Toast from 'react-native-toast-message'
+import BotonHome from "../components/BotonHome";
 
 export default function ProductByIdScreen() {
   const [pickCategory, setPickCategory] = useState("Botella");
@@ -71,6 +73,11 @@ export default function ProductByIdScreen() {
       setNombre();
       setPrecio();
       setListImage([]);
+      Toast.show({
+        type: 'success',
+        text1: 'Producto agregado',
+        visibilityTime: 1800,
+      })
     }
   };
   return (
@@ -79,8 +86,10 @@ export default function ProductByIdScreen() {
       resizeMode="cover"
       style={{ flex: 1, justifyContent: "center" }}
     >
+      <BotonHome>
       <View
         style={{
+          flex: 1,
           justifyContent: "center",
           alignItems: "center",
           height: "100%",
@@ -154,6 +163,7 @@ export default function ProductByIdScreen() {
           />
         </View>
       </View>
+      </BotonHome>
     </ImageBackground>
   );
 }

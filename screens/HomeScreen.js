@@ -14,6 +14,17 @@ import * as Notifications from "expo-notifications";
 import React, { useState, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
+import mesas from "../assets/mesasScreen.png";
+import comanda from "../assets/comanda.png";
+import ubicacion from "../assets/ubicacion.jpg";
+import agregar from "../assets/addProduct.png";
+import cajaImg from "../assets/Caja.png";
+import fotoDefault from "../assets/unnamed.jpg";
+import salir from "../assets/salir.png";
+import ajustes from "../assets/ajustes.png";
+import { addToken, URL } from "../api";
+import BotonHome from "../components/BotonHome";
+// import { socket } from "../socket";
 
 // Ajustes notification
 
@@ -27,15 +38,19 @@ Notifications.setNotificationHandler({
 
 //Fin
 
-import mesas from "../assets/mesasScreen.png";
-import comanda from "../assets/comanda.png";
-import ubicacion from "../assets/ubicacion.jpg";
-import agregar from "../assets/agregar.jpg";
-import fotoDefault from "../assets/unnamed.jpg";
-import salir from "../assets/salir.jpg";
-import { addToken } from "../api";
-
 const HomeScreen = ({ navigation }) => {
+  // const obj = {
+  //   name: "xabi",
+  //   apellido: "garrido",
+  // };
+  // useEffect(() => {
+  //   socket.emit("cliente:prueba", obj);
+
+  //   return () => {
+  //     socket.off("cliente:prueba");
+  //   };
+  // }, []);
+
   const user = useSelector((state) => state.userStore);
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
@@ -54,8 +69,8 @@ const HomeScreen = ({ navigation }) => {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        const idMesa = response.notification.request.content.data.idMesa
-        navigation.navigate('EstadoMesaScreen', {id: idMesa})
+        const idMesa = response.notification.request.content.data.idMesa;
+        navigation.navigate("EstadoMesaScreen", { id: idMesa });
       });
 
     return () => {
@@ -101,75 +116,104 @@ const HomeScreen = ({ navigation }) => {
         }}
       >
         <View style={styles.containerBotones}>
-          <View style={{ flexDirection: "row" }}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("PickMesaScreen")}
-            >
-              <View style={styles.ventanaBoton}>
-                <Image
-                  source={comanda}
-                  style={{ width: 80, height: 80, borderRadius: 30 }}
-                />
-                <View style={styles.ventanaTextBotones}>
-                  <Text style={styles.textBoton}>Nueva Comanda</Text>
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <View style={{ flexDirection: "row", marginBottom: 15 }}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("PickMesaScreen")}
+              >
+                <View style={styles.ventanaBoton}>
+                  <Image
+                    source={comanda}
+                    style={{ width: 80, height: 80, borderRadius: 30 }}
+                  />
+                  <View style={styles.ventanaTextBotones}>
+                    <Text style={styles.textBoton}>Nueva Comanda</Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("MesasScreen")}
-            >
-              <View style={styles.ventanaBoton}>
-                <Image
-                  source={mesas}
-                  style={{ width: 80, height: 80, borderRadius: 30 }}
-                />
-                <View style={styles.ventanaTextBotones}>
-                  <Text style={styles.textBoton}>Mesas</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("MesasScreen")}
+              >
+                <View style={styles.ventanaBoton}>
+                  <Image
+                    source={mesas}
+                    style={{ width: 80, height: 80, borderRadius: 30 }}
+                  />
+                  <View style={styles.ventanaTextBotones}>
+                    <Text style={styles.textBoton}> Estado Mesas</Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("PruebasScreen")}
-            >
-              <View style={styles.ventanaBoton}>
-                <Image
-                  source={agregar}
-                  style={{ width: 80, height: 80, borderRadius: 30 }}
-                />
-                <View style={styles.ventanaTextBotones}>
-                  <Text style={styles.textBoton}>Agregar Producto</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ flexDirection: "row", marginBottom: 15 }}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("PruebasScreen")}
+              >
+                <View style={styles.ventanaBoton}>
+                  <Image
+                    source={agregar}
+                    style={{ width: 80, height: 80, borderRadius: 30 }}
+                  />
+                  <View style={styles.ventanaTextBotones}>
+                    <Text style={styles.textBoton}>Agregar Producto</Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-          <View style={{ flexDirection: "row" }}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("TikadaScreen")}
-            >
-              <View style={styles.ventanaBoton}>
-                <Image
-                  source={ubicacion}
-                  style={{ width: 80, height: 80, borderRadius: 30 }}
-                />
-                <View style={styles.ventanaTextBotones}>
-                  <Text style={styles.textBoton}>Tikar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("AbrirCaja")}
+              >
+                <View style={styles.ventanaBoton}>
+                  <Image
+                    source={cajaImg}
+                    style={{ width: 80, height: 80, borderRadius: 30 }}
+                  />
+                  <View style={styles.ventanaTextBotones}>
+                    <Text style={styles.textBoton}>Gestion Caja</Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => removeAsync()}>
-              <View style={styles.ventanaBoton}>
-                <Image
-                  source={salir}
-                  style={{ width: 80, height: 80, borderRadius: 30 }}
-                />
-                <View style={styles.ventanaTextBotones}>
-                  <Text style={styles.textBoton}>Salir</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("GestionEmpresaScreen")}
+              >
+                <View style={styles.ventanaBoton}>
+                  <Image
+                    source={ajustes}
+                    style={{ width: 80, height: 80, borderRadius: 30 }}
+                  />
+                  <View style={styles.ventanaTextBotones}>
+                    <Text style={styles.textBoton}>Gestion empresa</Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("TikadaScreen")}
+              >
+                <View style={styles.ventanaBoton}>
+                  <Image
+                    source={ubicacion}
+                    style={{ width: 80, height: 80, borderRadius: 30 }}
+                  />
+                  <View style={styles.ventanaTextBotones}>
+                    <Text style={styles.textBoton}>Tikar</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => removeAsync()}>
+                <View style={styles.ventanaBoton}>
+                  <Image
+                    source={salir}
+                    style={{ width: 80, height: 80, borderRadius: 30 }}
+                  />
+                  <View style={styles.ventanaTextBotones}>
+                    <Text style={styles.textBoton}>Salir</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-
         <View
           style={{
             width: "90%",
@@ -197,7 +241,7 @@ const HomeScreen = ({ navigation }) => {
             }}
           >
             <Image
-              source={fotoDefault}
+              source={{uri: `${URL}/${user.foto}`}}
               style={{
                 height: 100,
                 width: 100,
@@ -215,7 +259,7 @@ const HomeScreen = ({ navigation }) => {
               </View>
 
               <View
-                style={{ ...styles.burbuja, width: "40%", marginVertical: 3 }}
+                style={{ ...styles.burbuja, width: "80%", marginVertical: 3 }}
               >
                 <Text style={{ color: "white", textAlign: "center" }}>
                   {user.rango.charAt(0).toUpperCase() + user.rango.slice(1)}
@@ -250,65 +294,6 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </View>
         </View>
-
-        {/* <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => navigation.navigate("PickMesaScreen")}
-          >
-            <View style={{ alignItems: "center", padding: 5 }}>
-              <Image
-                source={comanda}
-                style={{ width: 80, height: 80, borderRadius: 30 }}
-              />
-              <Text style={{ color: "white", fontWeight: "500" }}>
-                Nueva Comanda
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("MesasScreen")}>
-            <View style={{ alignItems: "center", padding: 5 }}>
-              <Image
-                source={mesas}
-                style={{ width: 80, height: 80, borderRadius: 30 }}
-              />
-              <Text style={{ color: "white" }}>Mesas</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={{ flexDirection: "column", justifyContent: "center" }}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("TikadaScreen");
-            }}
-          >
-            <View style={{ alignItems: "center", padding: 5 }}>
-              <Image
-                source={ubicacion}
-                style={{ width: 80, height: 80, borderRadius: 30 }}
-              />
-              <Text style={{ color: "white" }}>Tikar</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={removeAsync}>
-            <View style={{ alignItems: "center" }}>
-              <Image
-                source={salir}
-                style={{ width: 80, height: 80, borderRadius: 30 }}
-              />
-              <Text style={{ color: "white" }}>Salir</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <Button
-          title="Pruebas"
-          onPress={() => navigation.navigate("PruebasScreen")}
-        /> */}
       </View>
     </ImageBackground>
   );
@@ -379,15 +364,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   containerBotones: {
-    justifyContent: "center",
     marginTop: "10%",
-    width: "97%",
+    width: "88%",
+    alignItems: "center",
+    textAlign: "center",
     backgroundColor: "#FFFFFF90",
     borderRadius: 5,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    paddingHorizontal: 4,
-    paddingVertical: 5,
+    paddingHorizontal: 5,
+    paddingVertical: 20,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -409,6 +393,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     borderRadius: 20,
     alignItems: "center",
+    justifyContent: "center",
   },
 });
 // Fin funciones notification

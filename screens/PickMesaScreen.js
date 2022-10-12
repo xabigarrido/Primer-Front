@@ -1,111 +1,102 @@
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
   Image,
-  TextInput,
   TouchableOpacity,
-  Alert,
+  ImageBackground,
 } from "react-native";
-import { Button } from "@react-native-material/core";
 import React, { useRef, useState, useEffect } from "react";
 import MesaImg from "../assets/mesas.png";
-import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-} from "@gorhom/bottom-sheet";
-import { addMesa, getMesas } from "../api";
-const PickMesasScreen = ({ navigation }) => {
-  const bottomSheetModalRef = useRef(null);
-  const [numero, setNumero] = useState(null);
-  const [mesas, setMesas] = useState([]);
-  const snapPoints = ["25%", "75%"];
-  function handlePresentModal() {
-    bottomSheetModalRef.current?.present();
-  }
-  const handleCrearMesa = () => {
-    if (numero == null) {
-      Alert.alert("Debes poner un numero");
-    } else {
-      bottomSheetModalRef.current?.close();
-      addMesa(numero);
-      loadMesas();
-    }
-  };
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { isCajaOpen, getMesas } from "../api";
+import fondo from "../assets/fondoScreen.jpg";
+import BotonHome from "../components/BotonHome";
+import { Button } from "@react-native-material/core";
 
+const PickMesasScreen = ({ navigation }) => {
+  const [mesas, setMesas] = useState([]);
+  const [openCaja, setOpenCaja] = useState(0);
   const loadMesas = async () => {
+    const open = await isCajaOpen();
+    setOpenCaja(open.length);
     const data = await getMesas();
     setMesas(data);
   };
 
   useEffect(() => {
     loadMesas();
-  }, [numero]);
+  }, []);
   return (
     <BottomSheetModalProvider>
-      <ScrollView
-        style={{
-          backgroundColor: "black",
-        }}
-        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+      <ImageBackground
+        source={fondo}
+        resizeMode="cover"
+        style={{ flex: 1, justifyContent: "center" }}
       >
-        <View style={style.containerGeneral}>
-          <View style={style.containerMesas}>
-            {mesas.map((mesa, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => {
-                    navigation.navigate("ComandaScreen", {
-                      idMesa: mesa._id,
-                    });
-                  }}
+        <BotonHome>
+          <View style={style.containerGeneral}>
+            {openCaja == 1 && (
+              <View
+                style={{
+                  backgroundColor: "#E5E5E5",
+                  borderRadius: 15,
+                  padding: 20,
+                  width: "80%",
+                  alignItems: "center",
+                  marginBottom: 3,
+                }}
               >
-                <View style={style.containerMesa}>
-                  <View style={style.containerImg}>
-                    <Text style={{ fontSize: 22, fontWeight: "900" }}>
-                      {mesa.numeroMesa}
-                    </Text>
-                  </View>
-                  <Image source={MesaImg} style={style.styleImg} />
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Selecciona mesa para añadir nuevas comandas
+                </Text>
+              </View>
+            )}
+            <View style={style.containerMesas}>
+              {openCaja == 1 && (
+                <>
+                  {mesas.map((mesa, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => {
+                        navigation.navigate("ComandaScreen", {
+                          idMesa: mesa._id,
+                        });
+                      }}
+                    >
+                      <View style={style.containerMesa}>
+                        <View style={style.containerImg}>
+                          <Text style={{ fontSize: 22, fontWeight: "900" }}>
+                            {mesa.numeroMesa}
+                          </Text>
+                        </View>
+                        <Image source={MesaImg} style={style.styleImg} />
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </>
+              )}
+              {openCaja == 0 && (
+                <View style={{ alignItems: "center" }}>
+                  <Text style={{ fontSize: 22, fontWeight: "600" }}>
+                    Caja cerrada
+                  </Text>
+                  <Button
+                    title="Gestionar cajas"
+                    onPress={() => navigation.navigate("AbrirCaja")}
+                  />
                 </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-        <BottomSheetModal
-          ref={bottomSheetModalRef}
-          index={1}
-          snapPoints={snapPoints}
-          backgroundStyle={{
-            borderRadius: 50,
-            backgroundColor: "#F7F7F7",
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-
-            elevation: 5,
-            zIndex: 0,
-          }}
-          onDismiss={() => setNumero(null)}
-        >
-          <View style={style.contentContainer}>
-            <View style={style.containerModal}>
-              <TextInput
-                style={style.textInput}
-                placeholder="Numero mesa"
-                keyboardType="numeric"
-                onChangeText={(text) => setNumero(text)}
-              />
-              <Button title="Crear" onPress={() => handleCrearMesa()} />
+              )}
             </View>
           </View>
-        </BottomSheetModal>
-      </ScrollView>
+        </BotonHome>
+      </ImageBackground>
     </BottomSheetModalProvider>
   );
 };
@@ -125,22 +116,27 @@ const style = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
   },
-  containerGeneral: { flex: 1, padding: 5, alignItems: "center" },
+  containerGeneral: {
+    flex: 1,
+    padding: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   containerMesas: {
     backgroundColor: "#E5E5E5",
     borderRadius: 5,
-    paddingVertical: 15,
-    paddingHorizontal: 8,
+    paddingVertical: 50,
+    paddingHorizontal: 5,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
     width: "100%",
-    height: "100%",
     zIndex: 0,
   },
   styleImg: { width: 65, height: 65, margin: 5 },
   containerMesa: {
     position: "relative",
+    margin: 5,
     width: 66,
     height: 66,
     justifyContent: "center",
