@@ -1,10 +1,10 @@
 import { Alert } from "react-native";
 import Toast from "react-native-toast-message";
 
-export const API = "http://192.168.0.14:4000/api";
-export const URL = "http://192.168.0.14:4000/";
-// export const API = "https://lapiconera.herokuapp.com/api"
-// export const URL = "https://lapiconera.herokuapp.com/";
+// export const API = "http://192.168.0.14:4000/api";
+// export const URL = "http://192.168.0.14:4000/";
+export const API = "https://lapiconera.herokuapp.com/api"
+export const URL = "https://lapiconera.herokuapp.com/";
 
 export const changeInfoUser = async (id, action) => {
   try {

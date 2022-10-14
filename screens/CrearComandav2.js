@@ -150,12 +150,12 @@ export default function App({ navigation, route }) {
       Toast.show({
         type: "success",
         text1: "Comanda agregada",
-        position: "bottom",
+        // position: "bottom",
         visibilityTime: 1800,
       });
       console.log(datosMesa);
       editCopasBotellas(datosMesa)
-      navigation.navigate("TabScreen");
+      // navigation.navigate("TabScreen");
       // navigation.navigate("EstadoMesaScreen", { id: route.params.idMesa });
     } else {
       Alert.alert("Comanda vacia");

@@ -72,7 +72,7 @@ const EstadoMesa = ({ route, navigation }) => {
       type: "error",
       text1: `Producto eliminado`,
       position: "bottom",
-      bottomOffset: 0,
+      bottomOffset: 150,
       visibilityTime: 1000,
     });
   };
@@ -141,7 +141,7 @@ const EstadoMesa = ({ route, navigation }) => {
       type: "success",
       text1: "Cobrado",
       position: "bottom",
-      bottomOffset: 0,
+      bottomOffset: 350,
       visibilityTime: 1000,
     });
     socket.emit("cliente:actualizarComandas");

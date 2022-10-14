@@ -148,7 +148,7 @@ export default function App({ navigation }) {
   const dispatch = useDispatch();
   const handleTikado = () => {
     console.log(metros);
-    if (metros < 1500) {
+    if (metros < 150) {
       if (user.tikado == false) {
         dispatch(changeInfo(!user.tikado));
         changeInfoUser(user._id, !user.tikado);
@@ -181,7 +181,7 @@ export default function App({ navigation }) {
   };
 
   const handleSalida = () => {
-    if (metros < 1500) {
+    if (metros < 150) {
       if (user.tikado == true) {
         dispatch(changeInfo(!user.tikado));
         changeInfoUser(user._id, !user.tikado);
