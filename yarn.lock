@@ -7662,6 +7662,11 @@
   "resolved" "https://registry.npmjs.org/node-forge/-/node-forge-1.3.1.tgz"
   "version" "1.3.1"
 
+"node-git-hooks@^1.0.1":
+  "integrity" "sha512-ZTiTpRm16kxZY3JQugqjtm1u6nRt0cF2IH8lTMbiyv1V0qUA6ao8yHBwu4p58s3Ry+DbrlXOgUR4b4o/KzjWAA=="
+  "resolved" "https://registry.npmjs.org/node-git-hooks/-/node-git-hooks-1.0.6.tgz"
+  "version" "1.0.6"
+
 "node-html-parser@^1.2.12":
   "integrity" "sha512-UVcirFD1Bn0O+TSmloHeHqZZCxHjvtIeGdVdGMhyZ8/PWlEiZaZ5iJzR189yKZr8p0FXN58BUeC7RHRkf/KYGw=="
   "resolved" "https://registry.npmjs.org/node-html-parser/-/node-html-parser-1.4.9.tgz"
@@ -8711,7 +8716,7 @@
     "kleur" "^3.0.3"
     "sisteransi" "^1.0.5"
 
-"prop-types@*", "prop-types@^15.7.2":
+"prop-types@*", "prop-types@^15.6.0", "prop-types@^15.7.2":
   "integrity" "sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg=="
   "resolved" "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   "version" "15.8.1"
@@ -8989,6 +8994,15 @@
   "resolved" "https://registry.npmjs.org/react-is/-/react-is-18.2.0.tgz"
   "version" "18.2.0"
 
+"react-native-calendar-picker@^7.1.2":
+  "integrity" "sha512-n5ngdqbMIUeu2iHYxvKSX5u67wWqPYdhTx9sMjjQsjF6BrStxF65JCJSPaAORxD+wbFI5AK/xKDCFJfA0o1uFQ=="
+  "resolved" "https://registry.npmjs.org/react-native-calendar-picker/-/react-native-calendar-picker-7.1.2.tgz"
+  "version" "7.1.2"
+  dependencies:
+    "node-git-hooks" "^1.0.1"
+    "prop-types" "^15.6.0"
+    "recyclerlistview" "^3.0.0"
+
 "react-native-codegen@^0.69.2":
   "integrity" "sha512-yPcgMHD4mqLbckqnWjFBaxomDnBREfRjDi2G/WxNyPBQLD+PXUEmZTkDx6QoOXN+Bl2SkpnNOSsLE2+/RUHoPw=="
   "resolved" "https://registry.npmjs.org/react-native-codegen/-/react-native-codegen-0.69.2.tgz"
@@ -9243,6 +9257,15 @@
   "version" "2.2.2"
   dependencies:
     "minimatch" "3.0.4"
+
+"recyclerlistview@^3.0.0":
+  "integrity" "sha512-JVHz13u520faEsbVqFrJOMuJjc4mJlOXODe5QdqAJHdl5/IpyYeo83uiHrpzxyLb8QtJ0889JMlDik+Z1Ed0QQ=="
+  "resolved" "https://registry.npmjs.org/recyclerlistview/-/recyclerlistview-3.0.5.tgz"
+  "version" "3.0.5"
+  dependencies:
+    "lodash.debounce" "4.0.8"
+    "prop-types" "15.5.8"
+    "ts-object-utils" "0.0.5"
 
 "recyclerlistview@4.0.1":
   "integrity" "sha512-KPUK8uFkE7++hgaH9duoFh3ZQQOmyeIklcoe8RkzzrsK3PoUx8D6ABAo+UhRbwaYbgyqJTcILe2htW7wJeLBLQ=="

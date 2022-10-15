@@ -1,10 +1,74 @@
 import { Alert } from "react-native";
 import Toast from "react-native-toast-message";
 
-// export const API = "http://192.168.0.14:4000/api";
-// export const URL = "http://192.168.0.14:4000/";
-export const API = "https://lapiconera.herokuapp.com/api"
-export const URL = "https://lapiconera.herokuapp.com/";
+export const API = "http://192.168.0.14:4000/api";
+export const URL = "http://192.168.0.14:4000/";
+// export const API = "https://lapiconera.herokuapp.com/api"
+// export const URL = "https://lapiconera.herokuapp.com/";
+
+export const addEmpleado = async (empleado) => {
+  try {
+    const addEmpleado = await fetch(`${API}/empleados/add`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(empleado),
+    });
+
+    // const error = await addEmpleado.json();
+    return await addEmpleado.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteReserva = async (id) => {
+  try {
+    await fetch(`${API}/reservas/deleteReserva/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const reservaRecibida = async (id) => {
+  try {
+    await fetch(`${API}/reservas/reservaRecibida/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const getAllReservas = async () => {
+  try {
+    const data = await fetch(`${API}/reservas/getReservas`);
+    return await data.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const getReservas = async (dia) => {
+  try {
+    const data = await fetch(`${API}/reservas/getReserva/${dia}`);
+    return await data.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const addReserva = async (reserva) => {
+  console.log(reserva);
+  try {
+    await fetch(`${API}/reservas/addReserva`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reserva),
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const changeInfoUser = async (id, action) => {
   try {
@@ -291,17 +355,27 @@ export const getEmpleados = async () => {
 export const getTikadas = async (id) => {
   try {
     const data = await fetch(`${API}/tikada/empleado/${id}`);
-    return await data.json()
+    return await data.json();
   } catch (error) {
     console.log(error);
   }
 };
 
-export const getEmpleado = async (id)=>{
+export const getEmpleado = async (id) => {
   try {
-    const data = await fetch(`${API}/empleados/user/${id}`)
+    const data = await fetch(`${API}/empleados/user/${id}`);
     return await data.json();
-    
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteEmpleado = async id =>{
+  try {
+    await fetch(`${API}/empleados/deleteEmpleado/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.log(error)
   }

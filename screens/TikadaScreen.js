@@ -318,11 +318,7 @@ export default function App({ navigation }) {
                   latitude: location.coords.latitude,
                   longitude: location.coords.longitude,
                 }}
-                title="Dia 5"
-                description="Hora: 20:00"
-              >
-                <Callout tooltip={true} />
-              </Marker>
+              ></Marker>
             </MapView>
             <View
               style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}

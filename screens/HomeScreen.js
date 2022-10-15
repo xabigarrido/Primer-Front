@@ -3,26 +3,34 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  Button,
+  Pressable,
   Platform,
   ImageBackground,
   StyleSheet,
 } from "react-native";
+import { Button } from "@react-native-material/core";
+import { useSelector, useDispatch } from "react-redux";
+import { addInfoUser } from "../features/userStore";
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from "@gorhom/bottom-sheet";
+import * as ImagePicker from "expo-image-picker";
 import fondo from "../assets/fondoScreen.jpg";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import React, { useState, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useSelector } from "react-redux";
 import mesas from "../assets/mesasScreen.png";
 import comanda from "../assets/comanda.png";
 import ubicacion from "../assets/ubicacion.jpg";
 import agregar from "../assets/addProduct.png";
+import calendario from "../assets/calendario.png";
 import cajaImg from "../assets/Caja.png";
 import fotoDefault from "../assets/unnamed.jpg";
 import salir from "../assets/salir.png";
 import ajustes from "../assets/ajustes.png";
-import { addToken, URL } from "../api";
+import { addToken, URL, API, getEmpleado } from "../api";
 import BotonHome from "../components/BotonHome";
 // import { socket } from "../socket";
 
@@ -39,23 +47,70 @@ Notifications.setNotificationHandler({
 //Fin
 
 const HomeScreen = ({ navigation }) => {
-  // const obj = {
-  //   name: "xabi",
-  //   apellido: "garrido",
-  // };
-  // useEffect(() => {
-  //   socket.emit("cliente:prueba", obj);
+  const [listImage, setListImage] = useState([]);
+  const dispatch = useDispatch();
 
-  //   return () => {
-  //     socket.off("cliente:prueba");
-  //   };
-  // }, []);
+  const editFotoEmpleado = async (id, lista) => {
+    try {
+      for (let i = 0; i < lista.length; i++) {
+        let filename = lista[i].split("/").pop();
+        let match = /\.(\w+)$/.exec(filename);
+        let type = match ? `image/${match[1]}` : "image";
+        let data = new FormData();
+        data.append("image", { uri: lista[i], name: filename, type });
 
-  const user = useSelector((state) => state.userStore);
+        const query = await fetch(`${API}/empleados/cambiarFoto/${id}`, {
+          method: "PUT",
+          body: data,
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
+      setListImage([])
+      const data = await getEmpleado(user._id);
+      dispatch(addInfoUser(data));
+      return bottomSheetModalRef.current?.dismiss();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        }
+      }
+    })();
+  }, []);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setListImage([...listImage, result.uri]);
+    }
+  };
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
+  const bottomSheetModalRef = useRef(null);
+  const snapPoints = ["55%", "100%"];
+  function handlePresentModal() {
+    return bottomSheetModalRef.current?.snapToIndex(0);
+  }
+  const user = useSelector((state) => state.userStore);
+
+  useEffect(() => {
+    bottomSheetModalRef.current?.present();
+  }, [bottomSheetModalRef]);
 
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) =>
@@ -101,201 +156,282 @@ const HomeScreen = ({ navigation }) => {
   };
 
   return (
-    <ImageBackground
-      source={fondo}
-      resizeMode="cover"
-      style={{ flex: 1, justifyContent: "center" }}
-    >
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          height: "100%",
-          width: "100%",
-          justifyContent: "space-around",
-        }}
+    <BottomSheetModalProvider>
+      <ImageBackground
+        source={fondo}
+        resizeMode="cover"
+        style={{ flex: 1, justifyContent: "center" }}
       >
-        <View style={styles.containerBotones}>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <View style={{ flexDirection: "row", marginBottom: 15 }}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("PickMesaScreen")}
-              >
-                <View style={styles.ventanaBoton}>
-                  <Image
-                    source={comanda}
-                    style={{ width: 80, height: 80, borderRadius: 30 }}
-                  />
-                  <View style={styles.ventanaTextBotones}>
-                    <Text style={styles.textBoton}>Nueva Comanda</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("MesasScreen")}
-              >
-                <View style={styles.ventanaBoton}>
-                  <Image
-                    source={mesas}
-                    style={{ width: 80, height: 80, borderRadius: 30 }}
-                  />
-                  <View style={styles.ventanaTextBotones}>
-                    <Text style={styles.textBoton}> Estado Mesas</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-            <View style={{ flexDirection: "row", marginBottom: 15 }}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("PruebasScreen")}
-              >
-                <View style={styles.ventanaBoton}>
-                  <Image
-                    source={agregar}
-                    style={{ width: 80, height: 80, borderRadius: 30 }}
-                  />
-                  <View style={styles.ventanaTextBotones}>
-                    <Text style={styles.textBoton}>Agregar Producto</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("AbrirCaja")}
-              >
-                <View style={styles.ventanaBoton}>
-                  <Image
-                    source={cajaImg}
-                    style={{ width: 80, height: 80, borderRadius: 30 }}
-                  />
-                  <View style={styles.ventanaTextBotones}>
-                    <Text style={styles.textBoton}>Gestion Caja</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("GestionEmpresaScreen")}
-              >
-                <View style={styles.ventanaBoton}>
-                  <Image
-                    source={ajustes}
-                    style={{ width: 80, height: 80, borderRadius: 30 }}
-                  />
-                  <View style={styles.ventanaTextBotones}>
-                    <Text style={styles.textBoton}>Gestion empresa</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("TikadaScreen")}
-              >
-                <View style={styles.ventanaBoton}>
-                  <Image
-                    source={ubicacion}
-                    style={{ width: 80, height: 80, borderRadius: 30 }}
-                  />
-                  <View style={styles.ventanaTextBotones}>
-                    <Text style={styles.textBoton}>Tikar</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => removeAsync()}>
-                <View style={styles.ventanaBoton}>
-                  <Image
-                    source={salir}
-                    style={{ width: 80, height: 80, borderRadius: 30 }}
-                  />
-                  <View style={styles.ventanaTextBotones}>
-                    <Text style={styles.textBoton}>Salir</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
         <View
           style={{
-            width: "90%",
-            backgroundColor: "#FFFFFF90",
-            borderWidth: 1,
-            borderColor: "white",
-            borderRadius: 25,
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-
-            elevation: 5,
+            flex: 1,
+            alignItems: "center",
+            height: "100%",
+            width: "100%",
+            justifyContent: "space-around",
           }}
         >
-          <View
-            style={{
-              padding: 10,
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={{uri: `${URL}/${user.foto}`}}
-              style={{
-                height: 100,
-                width: 100,
-                borderRadius: 50,
-                borderWidth: 0.3,
-              }}
-            />
-            <View style={{ alignContent: "center", padding: 10 }}>
-              <View style={styles.burbuja}>
-                <Text
-                  style={{ color: "white", textAlign: "center", fontSize: 18 }}
+          <View style={styles.containerBotones}>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <View style={{ flexDirection: "row", marginBottom: 15 }}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("PickMesaScreen")}
                 >
-                  {user.nombre} {user.apellidos}
-                </Text>
+                  <View style={styles.ventanaBoton}>
+                    <Image
+                      source={comanda}
+                      style={{ width: 80, height: 80, borderRadius: 30 }}
+                    />
+                    <View style={styles.ventanaTextBotones}>
+                      <Text style={styles.textBoton}>Nueva Comanda</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("MesasScreen")}
+                >
+                  <View style={styles.ventanaBoton}>
+                    <Image
+                      source={mesas}
+                      style={{ width: 80, height: 80, borderRadius: 30 }}
+                    />
+                    <View style={styles.ventanaTextBotones}>
+                      <Text style={styles.textBoton}> Estado Mesas</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("CalendarioScreen")}
+                >
+                  <View style={styles.ventanaBoton}>
+                    <Image
+                      source={calendario}
+                      style={{ width: 80, height: 80, borderRadius: 1 }}
+                    />
+                    <View style={styles.ventanaTextBotones}>
+                      <Text style={styles.textBoton}>Reservas</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
               </View>
-
-              <View
-                style={{ ...styles.burbuja, width: "80%", marginVertical: 3 }}
-              >
-                <Text style={{ color: "white", textAlign: "center" }}>
-                  {user.rango.charAt(0).toUpperCase() + user.rango.slice(1)}
-                </Text>
+              <View style={{ flexDirection: "row", marginBottom: 15 }}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("PruebasScreen")}
+                >
+                  <View style={styles.ventanaBoton}>
+                    <Image
+                      source={agregar}
+                      style={{ width: 80, height: 80, borderRadius: 30 }}
+                    />
+                    <View style={styles.ventanaTextBotones}>
+                      <Text style={styles.textBoton}>Agregar Producto</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("AbrirCaja")}
+                >
+                  <View style={styles.ventanaBoton}>
+                    <Image
+                      source={cajaImg}
+                      style={{ width: 80, height: 80, borderRadius: 15 }}
+                    />
+                    <View style={styles.ventanaTextBotones}>
+                      <Text style={styles.textBoton}>Gestion Caja</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("GestionEmpresaScreen")}
+                >
+                  <View style={styles.ventanaBoton}>
+                    <Image
+                      source={ajustes}
+                      style={{ width: 80, height: 80, borderRadius: 30 }}
+                    />
+                    <View style={styles.ventanaTextBotones}>
+                      <Text style={styles.textBoton}>Gestion empresa</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
               </View>
-
-              {user.tikado == false ? (
-                <View
-                  style={{
-                    backgroundColor: "red",
-                    padding: 5,
-                    width: 100,
-                    alignItems: "center",
-                    borderRadius: 10,
-                  }}
+              <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("TikadaScreen")}
                 >
-                  <Text style={{ color: "white" }}>No has tikado</Text>
-                </View>
-              ) : (
-                <View
-                  style={{
-                    backgroundColor: "green",
-                    padding: 5,
-                    width: 100,
-                    alignItems: "center",
-                    borderRadius: 10,
-                  }}
-                >
-                  <Text style={{ color: "white" }}>Has tikado</Text>
-                </View>
-              )}
+                  <View style={styles.ventanaBoton}>
+                    <Image
+                      source={ubicacion}
+                      style={{ width: 80, height: 80, borderRadius: 30 }}
+                    />
+                    <View style={styles.ventanaTextBotones}>
+                      <Text style={styles.textBoton}>Tikar</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => removeAsync()}>
+                  <View style={styles.ventanaBoton}>
+                    <Image
+                      source={salir}
+                      style={{ width: 80, height: 80, borderRadius: 30 }}
+                    />
+                    <View style={styles.ventanaTextBotones}>
+                      <Text style={styles.textBoton}>Salir</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
+          <View
+            style={{
+              width: "90%",
+              backgroundColor: "#FFFFFF90",
+              borderWidth: 1,
+              borderColor: "white",
+              borderRadius: 25,
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+
+              elevation: 5,
+            }}
+          >
+            <TouchableOpacity onPress={handlePresentModal}>
+              <View
+                style={{
+                  padding: 10,
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={{ uri: `${URL}/${user.foto}` }}
+                  style={{
+                    height: 100,
+                    width: 100,
+                    borderRadius: 50,
+                    borderWidth: 0.3,
+                  }}
+                />
+                <View style={{ alignContent: "center", padding: 10 }}>
+                  <View style={styles.burbuja}>
+                    <Text
+                      style={{
+                        color: "white",
+                        textAlign: "center",
+                        fontSize: 18,
+                      }}
+                    >
+                      {user.nombre} {user.apellidos}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      ...styles.burbuja,
+                      width: "80%",
+                      marginVertical: 3,
+                    }}
+                  >
+                    <Text style={{ color: "white", textAlign: "center" }}>
+                      {user.rango.charAt(0).toUpperCase() + user.rango.slice(1)}
+                    </Text>
+                  </View>
+
+                  {user.tikado == false ? (
+                    <View
+                      style={{
+                        backgroundColor: "red",
+                        padding: 5,
+                        width: 100,
+                        alignItems: "center",
+                        borderRadius: 10,
+                      }}
+                    >
+                      <Text style={{ color: "white" }}>No has tikado</Text>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        backgroundColor: "green",
+                        padding: 5,
+                        width: 100,
+                        alignItems: "center",
+                        borderRadius: 10,
+                      }}
+                    >
+                      <Text style={{ color: "white" }}>Has tikado</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </ImageBackground>
+      </ImageBackground>
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        index={-1}
+        enableDismissOnClose={false}
+        snapPoints={snapPoints}
+        backgroundStyle={{
+          borderRadius: 50,
+          backgroundColor: "#F7F7F7",
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+
+          elevation: 5,
+          zIndex: 0,
+        }}
+      >
+        <View style={styles.contentContainer}>
+          <View style={styles.containerModal}>
+            {listImage.map((item, index) => (
+              <View
+                key={index}
+                style={{
+                  width: 150,
+                  height: 150,
+                  backgroundColor: "white",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 25,
+                  marginBottom: 30,
+                }}
+              >
+                <Image
+                  key={index}
+                  source={{ uri: item }}
+                  style={{ width: 120, height: 120 }}
+                />
+              </View>
+            ))}
+            {listImage.length < 1 && (
+              <Button
+                title="Cambiar foto perfil"
+                style={{ backgroundColor: "red", marginBottom: 10 }}
+                onPress={pickImage}
+              />
+            )}
+            <Button
+              title="cambiar"
+              onPress={() => editFotoEmpleado(user._id, listImage)}
+            />
+          </View>
+        </View>
+      </BottomSheetModal>
+    </BottomSheetModalProvider>
   );
 };
 async function schedulePushNotification() {
@@ -350,7 +486,18 @@ async function registerForPushNotificationsAsync() {
 
   return token;
 }
+
 const styles = StyleSheet.create({
+  containerModal: {
+    width: "100%",
+    height: "100%",
+    padding: 10,
+    alignItems: "center",
+  },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 15,
+  },
   textBoton: {
     color: "white",
     fontSize: 16,

@@ -19,6 +19,7 @@ import CajaFinalStatusId from "../screens/CajaFinalStatusId";
 import GestionEmpresaScreen from "../screens/GestionEmpresaScreen";
 import TikadasEmpleadoById from "../screens/TikadasEmpleadosById";
 import GestionEmpleadosScreen from "../screens/GestionEmpleadosScreen";
+import CalendarioScreen from '../screens/CalendarioScreen'
 
 const MyStackNavigator = () => {
   const MyStack = () => {
@@ -140,6 +141,11 @@ const MyStackNavigator = () => {
           <Stack.Screen
             name="GestionEmpleadosScreen"
             component={GestionEmpleadosScreen}
+            options={{ headerShown: false }}
+          />
+                    <Stack.Screen
+            name="CalendarioScreen"
+            component={CalendarioScreen}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>
