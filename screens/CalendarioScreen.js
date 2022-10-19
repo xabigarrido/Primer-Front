@@ -40,7 +40,6 @@ import {
   deleteReserva,
 } from "../api";
 import { FlashList } from "@shopify/flash-list";
-
 const CalendarioScreen = () => {
   const user = useSelector((state) => state.userStore);
   const bottomSheetModalRef = useRef(null);
@@ -60,7 +59,7 @@ const CalendarioScreen = () => {
   const loadReservas = async (date) => {
     const data = await getReservas(date);
     setReservas(data);
-    loadColorReservas();
+    // loadColorReservas();
 
   };
 
@@ -114,6 +113,7 @@ const CalendarioScreen = () => {
 
     // return () => {};
   }, []);
+
 
   // let today = moment();
   // let day = today.clone();
@@ -221,6 +221,7 @@ const CalendarioScreen = () => {
 
   const handleEliminarReserva = async (id) => {
     const newArray = reservas.filter((element) => element._id != id);
+
     setReservas(newArray);
     deleteReserva(id);
     Toast.show({

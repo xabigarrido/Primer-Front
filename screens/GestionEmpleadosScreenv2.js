@@ -1,6 +1,6 @@
 import { View, Text, ImageBackground, StyleSheet } from "react-native";
-import React, { useRef, useState, useEffect } from "react";
-
+import React, { useRef, useState, useEffect, Suspense } from "react";
+import { SWRConfig } from "swr";
 import fondo from "../assets/fondoScreen.jpg";
 import BotonHome from "../components/BotonHome";
 import Toast from "react-native-toast-message";
@@ -9,6 +9,11 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import { Button } from "@react-native-material/core";
+import useSWR from "swr";
+import { API } from "../api";
+import ListEmpleado from "../components/ListEmpleado";
+import ListEmpleadoFinal from './ListEmpleadosFinal'
+
 const GestionEmpleadosScreenv2 = () => {
   const bottomSheetModalRef = useRef(null);
   const snapPoints = ["25%", "55%"];
@@ -27,28 +32,39 @@ const GestionEmpleadosScreenv2 = () => {
         style={{ flex: 1, justifyContent: "center" }}
       >
         <BotonHome>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-              width: "100%",
+          <SWRConfig
+            value={{
+              refreshInterval: 0,
+              fetcher: (...args) => fetch(...args).then((res) => res.json()),
+              suspense: true,
             }}
           >
-            <View
-              style={{
-                width: "95%",
-                backgroundColor: "#F6F6F6",
-                alignItems: "center",
-                paddingVertical: 15,
-                borderRadius: 15,
-              }}
-            >
-              <Text>xxxx</Text>
-              <Button title="Press" onPress={handlePresentModal} />
-            </View>
-          </View>
+            <Suspense fallback={<Text style={styles.title}>Loading</Text>}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                  width: "100%",
+                }}
+              >
+                <View
+                  style={{
+                    width: "95%",
+                    backgroundColor: "#F6F6F6",
+                    alignItems: "center",
+                    paddingVertical: 15,
+                    borderRadius: 15,
+                  }}
+                >
+                  <ListEmpleadoFinal />
+                  {/* <ListEmpleado /> */}
+                  {/* <Button title="Press" onPress={handlePresentModal} /> */}
+                </View>
+              </View>
+            </Suspense>
+          </SWRConfig>
         </BotonHome>
       </ImageBackground>
       <BottomSheetModal
@@ -56,7 +72,6 @@ const GestionEmpleadosScreenv2 = () => {
         index={-1}
         snapPoints={snapPoints}
         enableDismissOnClose={false}
-
         backgroundStyle={{
           borderRadius: 50,
           backgroundColor: "#F7F7F7",
@@ -91,4 +106,18 @@ const style = StyleSheet.create({
     paddingHorizontal: 15,
   },
 });
+const styles = StyleSheet.create({
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginTop: 70,
+    textAlign: "center",
+    marginBottom: 30,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#FFF7E9",
+  },
+});
+
 export default GestionEmpleadosScreenv2;

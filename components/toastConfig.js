@@ -1,5 +1,6 @@
 import { BaseToast, ErrorToast } from "react-native-toast-message";
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
+import {URL} from '../api'
 
 export const toastConfig = {
   success: (props) => (
@@ -49,10 +50,56 @@ export const toastConfig = {
       I can consume any custom `props` I want.
       They will be passed when calling the `show` method (see below)
     */
-  tomatoToast: ({ text1, props }) => (
-    <View style={{ height: 60, width: "100%", backgroundColor: "tomato" }}>
-      <Text>{text1}</Text>
-      <Text>{props.uuid}</Text>
+  entradaTikada: ({ props }) => (
+    <View
+    style={{
+      width: "80%",
+      backgroundColor: "#C9FEB8",
+      // height: 65,
+      borderRadius: 10,
+      padding: 10,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 0.17
+    }}
+  >
+    <View style={{flexDirection: 'row', justifyContent: 'space-evenly', width: '100%', alignItems: 'center'}}>
+    <Image 
+    source={{uri: `${URL}${props.foto}`}}
+    style={{width: 45, height: 45, borderRadius: 15,}}
+    />
+    <View>
+    <Text style={{fontWeight: 'bold' }}>{props.nombre} {props.apellidos}</Text>
+    <Text style={{fontWeight: '400' }}>ha entrado a trabajar</Text>
     </View>
+    </View>
+
+  </View>
+  ),
+  salidaTikada: ({ props }) => (
+    <View
+    style={{
+      width: "80%",
+      backgroundColor: "#FEB8B8",
+      // height: 65,
+      borderRadius: 10,
+      padding: 10,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 0.17
+    }}
+  >
+    <View style={{flexDirection: 'row', justifyContent: 'space-evenly', width: '100%', alignItems: 'center'}}>
+    <Image 
+    source={{uri: `${URL}${props.foto}`}}
+    style={{width: 45, height: 45, borderRadius: 15,}}
+    />
+    <View>
+    <Text style={{fontWeight: 'bold' }}>{props.nombre} {props.apellidos}</Text>
+    <Text style={{fontWeight: '400' }}>ha salido de trabajar</Text>
+    </View>
+    </View>
+
+  </View>
   ),
 };

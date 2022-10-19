@@ -19,9 +19,33 @@ import CajaFinalStatusId from "../screens/CajaFinalStatusId";
 import GestionEmpresaScreen from "../screens/GestionEmpresaScreen";
 import TikadasEmpleadoById from "../screens/TikadasEmpleadosById";
 import GestionEmpleadosScreen from "../screens/GestionEmpleadosScreen";
-import CalendarioScreen from '../screens/CalendarioScreen'
+import CalendarioScreen from "../screens/CalendarioScreen";
+import { Text } from "react-native";
+import Toast from "react-native-toast-message";
+import { socket } from "../socket";
 
 const MyStackNavigator = () => {
+  useEffect(() => {
+    socket.on("servidor:tikadaEntrada", (data) => {
+      Toast.show({
+        type: "entradaTikada",
+        props: data,
+        visibilityTime: 3200,
+      });
+    });
+    socket.on("servidor:tikadaSalida", (data) => {
+      console.log(data)
+      Toast.show({
+        type: "salidaTikada",
+        props: data,
+        visibilityTime: 3200,
+      });
+    });
+    return () =>{
+      socket.off('servidor:tikadaEntrada')
+      socket.off('servidor:tikadaSalida')
+    }
+  }, []);
   const MyStack = () => {
     const Stack = createStackNavigator();
     const Tab = createBottomTabNavigator();
@@ -143,7 +167,7 @@ const MyStackNavigator = () => {
             component={GestionEmpleadosScreen}
             options={{ headerShown: false }}
           />
-                    <Stack.Screen
+          <Stack.Screen
             name="CalendarioScreen"
             component={CalendarioScreen}
             options={{ headerShown: false }}

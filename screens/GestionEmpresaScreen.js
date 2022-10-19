@@ -59,7 +59,10 @@
 //   );
 // };
 
-import { NativeViewGestureHandler, ScrollView } from "react-native-gesture-handler";
+import {
+  NativeViewGestureHandler,
+  ScrollView,
+} from "react-native-gesture-handler";
 import "react-native-get-random-values";
 import { View, Text, ImageBackground, StyleSheet, Image } from "react-native";
 import {
@@ -73,9 +76,8 @@ import fondo from "../assets/fondoScreen.jpg";
 import BotonHome from "../components/BotonHome";
 import Toast from "react-native-toast-message";
 import moment from "moment";
-import ubicacion from "../assets/ubicacion.jpg";
 import empleadosImg from "../assets/empleados.png";
-import fotoDefault from "../assets/unnamed.jpg";
+import ajustesTools from "../assets/tools.png";
 
 import { Button } from "@react-native-material/core";
 import { getEmpleados, URL } from "../api";
@@ -125,42 +127,17 @@ const GestionEmpresaScreen = ({ navigation }) => {
             <View
               style={{
                 width: "95%",
-                height: "80%",
                 backgroundColor: "#F6F6F6",
                 alignItems: "center",
                 paddingVertical: 15,
                 borderRadius: 15,
               }}
             >
-              <View style={{ flexDirection: "row", flexWrap: "wrap",}}>
-                <TouchableOpacity onPress={handlePresentModal}>
-                  <View
-                    style={{
-                      borderWidth: 0.3,
-                      padding: 6,
-                      alignItems: "center",
-                      borderRadius: 15,
-                      backgroundColor: "white",
-                      shadowColor: "#000",
-                      shadowOffset: {
-                        width: 0,
-                        height: 2,
-                      },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 3.84,
-
-                      elevation: 5,
-                    }}
-                  >
-                    <Image
-                      source={ubicacion}
-                      style={{ width: 50, height: 70, borderRadius: 30 }}
-                    />
-                    <Text style={{ textAlign: "center" }}>Tikada </Text>
-                    <Text style={{ textAlign: "center" }}>Empleados </Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>navigation.navigate('GestionEmpleadosScreen')}>
+              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("GestionEmpleadosScreen")}
+                  style={{marginRight: 10}}
+                >
                   <View
                     style={{
                       borderWidth: 0.3,
@@ -185,6 +162,33 @@ const GestionEmpresaScreen = ({ navigation }) => {
                     />
                     <Text style={{ textAlign: "center" }}>Gestion </Text>
                     <Text style={{ textAlign: "center" }}>Empleados </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handlePresentModal}>
+                  <View
+                    style={{
+                      borderWidth: 0.3,
+                      padding: 6,
+                      alignItems: "center",
+                      borderRadius: 15,
+                      backgroundColor: "white",
+                      shadowColor: "#000",
+                      shadowOffset: {
+                        width: 0,
+                        height: 2,
+                      },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3.84,
+
+                      elevation: 5,
+                    }}
+                  >
+                    <Image
+                      source={ajustesTools}
+                      style={{ width: 50, height: 70, borderRadius: 30 }}
+                    />
+                    <Text style={{ textAlign: "center" }}>Ajustes </Text>
+                    <Text style={{ textAlign: "center" }}>La Piconera </Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -215,50 +219,66 @@ const GestionEmpresaScreen = ({ navigation }) => {
         <View style={style.contentContainer}>
           <View style={style.containerModal}>
             <ScrollView>
-            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-              {empleados.map((empleado, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() =>
-                    navigation.navigate("TikadasEmpleadoById", {
-                      idEmpleado: empleado._id,
-                    })
-                  }
-                >
-                  <View
-                    style={{
-                      margin: 3,
-                      borderRadius: 15,
-                      borderWidth: 0.5,
-                      padding: 10,
-                      alignItems: "center",
-                      backgroundColor: "white",
-                      shadowColor: "#000",
-                      shadowOffset: {
-                        width: 0,
-                        height: 2,
-                      },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 3.84,
-
-                      elevation: 5,
-                    }}
+              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                {empleados.map((empleado, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() =>
+                      navigation.navigate("TikadasEmpleadoById", {
+                        idEmpleado: empleado._id,
+                      })
+                    }
                   >
-                    <Image
-                      source={{ uri: `${URL}${empleado.foto}` }}
+                    <View
                       style={{
-                        height: 60,
-                        width: 60,
-                        borderRadius: 50,
-                        borderWidth: 0.3,
+                        margin: 3,
+                        borderRadius: 15,
+                        borderWidth: 0.5,
+                        padding: 10,
+                        alignItems: "center",
+                        backgroundColor:
+                          empleado.tikado == true ? "#9DCA92" : "white",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+
+                        elevation: 5,
                       }}
-                    />
-                    <Text>{empleado.nombre}</Text>
-                    <Text>{empleado.apellidos}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
+                    >
+                      <Image
+                        source={{ uri: `${URL}${empleado.foto}`}}
+                        style={{
+                          height: 60,
+                          width: 60,
+                          borderRadius: 50,
+                          borderWidth: 0.3,
+                        }}
+                      />
+                      <Text>{empleado.nombre}</Text>
+                      <Text>{empleado.apellidos}</Text>
+                      {empleado.tikado == true && (
+                        <>
+                          <View
+                            style={{
+                              height: 15,
+                              width: 15,
+                              backgroundColor: "#F90000",
+                              borderRadius: 20,
+                            }}
+                          ></View>
+                          <Text style={{ fontWeight: "bold", fontSize: 10 }}>
+                            TRABAJANDO
+                          </Text>
+                        </>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </ScrollView>
           </View>
         </View>

@@ -127,17 +127,25 @@ import { Button, FAB } from "@react-native-material/core";
 import moment from "moment";
 import { useSelector, useDispatch } from "react-redux";
 import { changeInfo } from "../features/userStore";
-import { changeInfoUser, entradaTikada, salidaTikada } from "../api";
+import {
+  changeInfoUser,
+  entradaTikada,
+  salidaTikada,
+  loadEmpeladoTikadaActual,
+} from "../api";
 import fondo from "../assets/fondoScreentikada.jpg";
 import BotonHome from "../components/BotonHome";
 import Toast from "react-native-toast-message";
 import { getPreciseDistance } from "geolib";
-
+import { socket } from "../socket";
 export default function App({ navigation }) {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [metros, setMetros] = useState(0);
   const [fecha, setFecha] = useState();
+  const [distancia, setDistancia] = useState(0);
+  const [tikadaActual, setTikadaActual] = useState(null);
+  const [tiempoTrabajado, setTiempoTrabajado] = useState("");
   useEffect(() => {
     const interval = setInterval(() => {
       setFecha(moment().format("DD/MM/YYYY, HH:mm:ss"));
@@ -147,8 +155,7 @@ export default function App({ navigation }) {
   const user = useSelector((state) => state.userStore);
   const dispatch = useDispatch();
   const handleTikado = () => {
-    console.log(metros);
-    if (metros < 150) {
+    if (metros < 1500) {
       if (user.tikado == false) {
         dispatch(changeInfo(!user.tikado));
         changeInfoUser(user._id, !user.tikado);
@@ -164,11 +171,13 @@ export default function App({ navigation }) {
           comentario: "Ninguno",
         };
         entradaTikada(newTikada);
+        socket.emit("cliente:tikadaEntrada", { user });
         Toast.show({
           type: "success",
           text1: "Entrada Registrada",
           visibilityTime: 1800,
         });
+
         navigation.navigate("TabScreen");
       } else {
         Alert.alert("No puedes tikar la entrada si ya has tikado");
@@ -181,7 +190,7 @@ export default function App({ navigation }) {
   };
 
   const handleSalida = () => {
-    if (metros < 150) {
+    if (metros < 1500) {
       if (user.tikado == true) {
         dispatch(changeInfo(!user.tikado));
         changeInfoUser(user._id, !user.tikado);
@@ -190,6 +199,7 @@ export default function App({ navigation }) {
           salida: moment().unix(),
         };
         salidaTikada(user._id, newSalida);
+        socket.emit("cliente:tikadaSalida", { user });
         Toast.show({
           type: "success",
           text1: "Salida Registrada",
@@ -234,6 +244,56 @@ export default function App({ navigation }) {
 
     return () => {};
   }, [location]);
+  useEffect(() => {
+    console.log(metros.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+
+    if (Platform.OS == "android") {
+      if (metros != 0) {
+        const separar = metros
+          .toString()
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          .split(",");
+        if (separar[1] < 100) {
+          separar[1] = separar[1].substring(1);
+        }
+        setDistancia(`${separar[0]} km ${separar[1]} metros`);
+      }
+    }
+
+    if (Platform.OS == "ios") {
+      if (metros != 0) {
+        const separar = metros.toLocaleString("es-MX").split(",");
+        if (separar[1] < 100) {
+          separar[1] = separar[1].substring(1);
+        }
+        setDistancia(`${separar[0]} km ${separar[1]} metros`);
+      }
+    }
+  }, [metros]);
+  function secondsToString(seconds) {
+    var hour = Math.floor(seconds / 3600);
+    hour = hour < 10 ? "0" + hour : hour;
+    var minute = Math.floor((seconds / 60) % 60);
+    minute = minute < 10 ? "0" + minute : minute;
+    var second = seconds % 60;
+    second = second < 10 ? "0" + second : second;
+    return hour + ":" + minute + ":" + second;
+  }
+  const loadTikada = async () => {
+    if (user.tikado == true) {
+    const data = await loadEmpeladoTikadaActual(user._id);
+    console.log(data);
+    setTikadaActual(data);
+    const segundos = moment().diff(moment.unix(data.entrada), "s");
+    const totalTrabajado = secondsToString(segundos);
+    const separar = totalTrabajado.split(":");
+
+    return setTiempoTrabajado(separar[0] + " horas | " + separar[1] + " minutos");
+    }
+  };
+  useEffect(() => {
+      loadTikada();
+  }, []);
 
   let text = "Waiting..";
   if (errorMsg) {
@@ -259,7 +319,7 @@ export default function App({ navigation }) {
                 position: "absolute",
                 zIndex: 1000,
                 backgroundColor: "#00000099",
-                height: 150,
+                height: 180,
                 width: "90%",
                 top: "5%",
                 left: "5%",
@@ -274,15 +334,63 @@ export default function App({ navigation }) {
                 style={{
                   backgroundColor: "#ffffff",
                   width: "80%",
-                  height: 50,
+                  height: 100,
                   marginVertical: 10,
                   borderRadius: 10,
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ textAlign: "center", fontSize: 18 }}>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 18,
+                    fontWeight: "bold",
+                  }}
+                >
                   {fecha}
                 </Text>
+                <View style={{ alignItems: "center" }}>
+                  {user.tikado == false && (<>
+                    <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: metros < 150 ? "green" : "red",
+                    }}
+                  >
+                    {distancia}
+                  </Text>
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={{ fontSize: 16 }}>de distancia a </Text>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: "blue",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      La Piconera
+                    </Text>
+                  </View></>)}
+                  {tikadaActual != null && (
+                    <>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          color: "green",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Entrada {tikadaActual.entradaHumana}
+                      </Text>
+                      <View style={{backgroundColor: '#616161', paddingHorizontal: 20, paddingVertical: 3, borderRadius: 10}}>
+
+                        <Text style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>{tiempoTrabajado}</Text>
+                        <Text style={{fontSize: 12, fontWeight: 'bold', color: 'white', textAlign: 'center'}}>TIEMPO TRABAJANDO</Text>
+                      </View>
+                    </>
+                  )}
+                </View>
               </View>
               <View style={{ flexDirection: "row" }}>
                 <Button

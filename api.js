@@ -6,6 +6,15 @@ export const URL = "http://192.168.0.14:4000/";
 // export const API = "https://lapiconera.herokuapp.com/api"
 // export const URL = "https://lapiconera.herokuapp.com/";
 
+
+export const loadEmpeladoTikadaActual = async (id) =>{
+try {
+  const data = await fetch(`${API}/tikada/tikadaActual/${id}`);
+  return await data.json();
+} catch (error) {
+  console.log(error)
+}
+}
 export const addEmpleado = async (empleado) => {
   try {
     const addEmpleado = await fetch(`${API}/empleados/add`, {
@@ -69,13 +78,37 @@ export const addReserva = async (reserva) => {
     console.log(error);
   }
 };
+export const editarEmpleadoApi = async (id, action) => {
+  try {
 
+     await fetch(`${API}/empleados/editarEmpleado/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({action}),
+    });
+    // console.log(req);
+  } catch (error) {
+    console.log(error);
+  }
+};
 export const changeInfoUser = async (id, action) => {
   try {
     await fetch(`${API}/empleados/changeInfo/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ tikado: action }),
+    });
+    console.log(id, action);
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const changeInfoUserMaster = async (id, action) => {
+  try {
+    await fetch(`${API}/empleados/changeInfo/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(action),
     });
     console.log(id, action);
   } catch (error) {
@@ -352,14 +385,25 @@ export const getEmpleados = async () => {
   }
 };
 
-export const getTikadas = async (id) => {
+export const getTikadas = async (id, mes, year) => {
   try {
-    const data = await fetch(`${API}/tikada/empleado/${id}`);
+    const data = await fetch(`${API}/tikada/empleado/${id}/${mes}/${year}`);
     return await data.json();
   } catch (error) {
     console.log(error);
   }
 };
+
+export const deleteTikada = async id =>{
+  try {
+    await fetch(`${API}/tikada/tikadaDelete/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export const getEmpleado = async (id) => {
   try {

@@ -8,7 +8,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { addInfoUser } from "../features/userStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
-import Toast from 'react-native-toast-message';
 
 const LoginScreen = ({ navigation }) => {
   const [asyncData, setAsyncData] = useState(null);
@@ -78,15 +77,6 @@ const LoginScreen = ({ navigation }) => {
       return console.log(error);
     }
   };
-  const showToast = () => {
-    Toast.show({
-      type: 'success',
-      text1: 'Producto agregado',
-      visibilityTime: 1800,
-      position: 'top',
-      onPress: ()=>{ console.log('ss')}
-    });
-  }
 
   return (
     <ImageBackground
