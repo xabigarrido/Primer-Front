@@ -132,6 +132,7 @@ import {
   entradaTikada,
   salidaTikada,
   loadEmpeladoTikadaActual,
+  getEmpresa,
 } from "../api";
 import fondo from "../assets/fondoScreentikada.jpg";
 import BotonHome from "../components/BotonHome";
@@ -146,16 +147,28 @@ export default function App({ navigation }) {
   const [distancia, setDistancia] = useState(0);
   const [tikadaActual, setTikadaActual] = useState(null);
   const [tiempoTrabajado, setTiempoTrabajado] = useState("");
+  const [empresa, setEmpresa] = useState({});
+
+  const loadEmpresa = async () => {
+    const data = await getEmpresa(user.empresa);
+    setEmpresa(data);
+  };
+
+  useEffect(() => {
+    loadEmpresa();
+  }, []);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setFecha(moment().format("DD/MM/YYYY, HH:mm:ss"));
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
   const user = useSelector((state) => state.userStore);
   const dispatch = useDispatch();
   const handleTikado = () => {
-    if (metros < 1500) {
+    if (metros < empresa.rangoTikada) {
       if (user.tikado == false) {
         dispatch(changeInfo(!user.tikado));
         changeInfoUser(user._id, !user.tikado);
@@ -184,13 +197,13 @@ export default function App({ navigation }) {
       }
     } else {
       Alert.alert(
-        "Debes estar a menos de 150 metros de La Piconera para poder tikar la entrada"
+        `Debes estar a menos de ${empresa.rangoTikada} metros de ${empresa.nombreEmpresa} para poder tikar la entrada`
       );
     }
   };
 
   const handleSalida = () => {
-    if (metros < 1500) {
+    if (metros < empresa.rangoTikada) {
       if (user.tikado == true) {
         dispatch(changeInfo(!user.tikado));
         changeInfoUser(user._id, !user.tikado);
@@ -211,7 +224,7 @@ export default function App({ navigation }) {
       }
     } else {
       Alert.alert(
-        "Debes estar a menos de 150 metros de La Piconera para poder tikar la salida"
+        `Debes estar a menos de ${empresa.rangoTikada} metros de ${empresa.nombreEmpresa} para poder tikar la salida`
       );
     }
   };
@@ -237,7 +250,8 @@ export default function App({ navigation }) {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           },
-          { latitude: 37.3792876194074, longitude: -6.000270583243217 }
+          { latitude: 37.3792876194074, longitude: -6.000270583243217 } // piconera
+          // { latitude: 37.38554265639422, longitude: -6.011333270138696 }
         )
       );
     }
@@ -245,29 +259,33 @@ export default function App({ navigation }) {
     return () => {};
   }, [location]);
   useEffect(() => {
-    console.log(metros.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-
-    if (Platform.OS == "android") {
-      if (metros != 0) {
-        const separar = metros
-          .toString()
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-          .split(",");
-        if (separar[1] < 100) {
-          separar[1] = separar[1].substring(1);
+    // console.log(metros.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+    console.log(metros);
+    if (metros >= 1000) {
+      if (Platform.OS == "android") {
+        if (metros != 0) {
+          const separar = metros
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            .split(",");
+          if (separar[1] < 100) {
+            separar[1] = separar[1].substring(1);
+          }
+          setDistancia(`${separar[0]} km ${separar[1]} metros`);
         }
-        setDistancia(`${separar[0]} km ${separar[1]} metros`);
       }
-    }
 
-    if (Platform.OS == "ios") {
-      if (metros != 0) {
-        const separar = metros.toLocaleString("es-MX").split(",");
-        if (separar[1] < 100) {
-          separar[1] = separar[1].substring(1);
+      if (Platform.OS == "ios") {
+        if (metros != 0) {
+          const separar = metros.toLocaleString("es-MX").split(",");
+          if (separar[1] < 100) {
+            separar[1] = separar[1].substring(1);
+          }
+          setDistancia(`${separar[0]} km ${separar[1]} metros`);
         }
-        setDistancia(`${separar[0]} km ${separar[1]} metros`);
       }
+    } else {
+      setDistancia(`${metros} metros`);
     }
   }, [metros]);
   function secondsToString(seconds) {
@@ -281,18 +299,21 @@ export default function App({ navigation }) {
   }
   const loadTikada = async () => {
     if (user.tikado == true) {
-    const data = await loadEmpeladoTikadaActual(user._id);
-    console.log(data);
-    setTikadaActual(data);
-    const segundos = moment().diff(moment.unix(data.entrada), "s");
-    const totalTrabajado = secondsToString(segundos);
-    const separar = totalTrabajado.split(":");
+      const data = await loadEmpeladoTikadaActual(user._id);
+      // console.log(data);
+      console.log(user);
+      setTikadaActual(data);
+      const segundos = moment().diff(moment.unix(data.entrada), "s");
+      const totalTrabajado = secondsToString(segundos);
+      const separar = totalTrabajado.split(":");
 
-    return setTiempoTrabajado(separar[0] + " horas | " + separar[1] + " minutos");
+      return setTiempoTrabajado(
+        separar[0] + " horas | " + separar[1] + " minutos"
+      );
     }
   };
   useEffect(() => {
-      loadTikada();
+    loadTikada();
   }, []);
 
   let text = "Waiting..";
@@ -350,28 +371,31 @@ export default function App({ navigation }) {
                   {fecha}
                 </Text>
                 <View style={{ alignItems: "center" }}>
-                  {user.tikado == false && (<>
-                    <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: "bold",
-                      color: metros < 150 ? "green" : "red",
-                    }}
-                  >
-                    {distancia}
-                  </Text>
-                  <View style={{ flexDirection: "row" }}>
-                    <Text style={{ fontSize: 16 }}>de distancia a </Text>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color: "blue",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      La Piconera
-                    </Text>
-                  </View></>)}
+                  {user.tikado == false && (
+                    <>
+                      <Text
+                        style={{
+                          fontSize: 18,
+                          fontWeight: "bold",
+                          color: metros < empresa.rangoTikada ? "green" : "red",
+                        }}
+                      >
+                        {distancia}
+                      </Text>
+                      <View style={{ flexDirection: "row" }}>
+                        <Text style={{ fontSize: 16 }}>de distancia a </Text>
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            color: "blue",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {empresa.nombreEmpresa}
+                        </Text>
+                      </View>
+                    </>
+                  )}
                   {tikadaActual != null && (
                     <>
                       <Text
@@ -383,10 +407,33 @@ export default function App({ navigation }) {
                       >
                         Entrada {tikadaActual.entradaHumana}
                       </Text>
-                      <View style={{backgroundColor: '#616161', paddingHorizontal: 20, paddingVertical: 3, borderRadius: 10}}>
-
-                        <Text style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>{tiempoTrabajado}</Text>
-                        <Text style={{fontSize: 12, fontWeight: 'bold', color: 'white', textAlign: 'center'}}>TIEMPO TRABAJANDO</Text>
+                      <View
+                        style={{
+                          backgroundColor: "#616161",
+                          paddingHorizontal: 20,
+                          paddingVertical: 3,
+                          borderRadius: 10,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            fontWeight: "bold",
+                            color: "white",
+                          }}
+                        >
+                          {tiempoTrabajado}
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: "bold",
+                            color: "white",
+                            textAlign: "center",
+                          }}
+                        >
+                          TIEMPO TRABAJANDO
+                        </Text>
                       </View>
                     </>
                   )}

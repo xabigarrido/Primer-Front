@@ -64,7 +64,14 @@ import {
   ScrollView,
 } from "react-native-gesture-handler";
 import "react-native-get-random-values";
-import { View, Text, ImageBackground, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  ImageBackground,
+  StyleSheet,
+  Image,
+  TextInput,
+} from "react-native";
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
@@ -78,13 +85,35 @@ import Toast from "react-native-toast-message";
 import moment from "moment";
 import empleadosImg from "../assets/empleados.png";
 import ajustesTools from "../assets/tools.png";
-
+import Piconera from "../assets/Logo-Piconera.png";
+import Antique from "../assets/Logo-Antique.png";
+import Rosso from "../assets/Logo-ROSSO.png";
 import { Button } from "@react-native-material/core";
-import { getEmpleados, URL } from "../api";
+import { getEmpleados, getEmpresa, URL, editEmpresa } from "../api";
+
 const GestionEmpresaScreen = ({ navigation }) => {
   const bottomSheetModalRef = useRef(null);
   const [empleados, setEmpleados] = useState([]);
   const snapPoints = ["80%", "100%"];
+  const [pickEmpresa, setPickEmpresa] = useState(null);
+  const [empresa, setEmpresa] = useState({});
+  const [precioCopa, setPrecioCopa] = useState(0);
+  const [rangoTikada, setRangoTikada] = useState(0);
+
+  const loadEmpresa = async (id) => {
+    const data = await getEmpresa(id);
+    console.log(data);
+    setEmpresa(data);
+  };
+  useEffect(() => {
+    if (pickEmpresa != null) {
+      loadEmpresa(pickEmpresa);
+      setPrecioCopa(pickEmpresa.precioCopa)
+      setRangoTikada(pickEmpresa.rangoTikada)
+    }
+    return () => {};
+  }, [pickEmpresa]);
+
   function handlePresentModal() {
     return bottomSheetModalRef.current?.snapToIndex(0);
   }
@@ -136,7 +165,7 @@ const GestionEmpresaScreen = ({ navigation }) => {
               <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("GestionEmpleadosScreen")}
-                  style={{marginRight: 10}}
+                  style={{ marginRight: 10 }}
                 >
                   <View
                     style={{
@@ -188,7 +217,7 @@ const GestionEmpresaScreen = ({ navigation }) => {
                       style={{ width: 50, height: 70, borderRadius: 30 }}
                     />
                     <Text style={{ textAlign: "center" }}>Ajustes </Text>
-                    <Text style={{ textAlign: "center" }}>La Piconera </Text>
+                    <Text style={{ textAlign: "center" }}>Empresas </Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -219,7 +248,7 @@ const GestionEmpresaScreen = ({ navigation }) => {
         <View style={style.contentContainer}>
           <View style={style.containerModal}>
             <ScrollView>
-              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              {/* <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                 {empleados.map((empleado, index) => (
                   <TouchableOpacity
                     key={index}
@@ -278,6 +307,186 @@ const GestionEmpresaScreen = ({ navigation }) => {
                     </View>
                   </TouchableOpacity>
                 ))}
+              </View> */}
+              <View style={{ width: "100%" }}>
+                {pickEmpresa == null && (
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        setPickEmpresa("6350346b5e2286c0a43467c4");
+                      }}
+                    >
+                      <View style={{ alignItems: "center", marginBottom: 10 }}>
+                        <Image
+                          source={Piconera}
+                          style={{
+                            borderRadius: 50,
+                            height: 120,
+                            width: 120,
+                            // borderWidth: 0.3,
+                          }}
+                        />
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            paddingHorizontal: 20,
+                            paddingVertical: 10,
+                            borderRadius: "20",
+                            marginTop: 1,
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold", color: "white" }}>
+                            La Piconera
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setPickEmpresa("635034a45e2286c0a43467c6");
+                      }}
+                    >
+                      <View style={{ alignItems: "center", marginBottom: 10 }}>
+                        <Image
+                          source={Antique}
+                          style={{
+                            borderRadius: 50,
+                            height: 120,
+                            width: 120,
+                            // borderWidth: 0.3,
+                          }}
+                        />
+                        {/* <Text style={{fontWeight: 'bold'}}>La Piconera</Text> */}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            paddingHorizontal: 20,
+                            paddingVertical: 10,
+                            borderRadius: "20",
+                            marginTop: 1,
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold", color: "white" }}>
+                            Antique
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setPickEmpresa("635034ab5e2286c0a43467c8");
+                      }}
+                    >
+                      <View style={{ alignItems: "center", marginBottom: 10 }}>
+                        <Image
+                          source={Rosso}
+                          style={{
+                            borderRadius: 50,
+                            height: 120,
+                            width: 120,
+                            // borderWidth: 0.3,
+                          }}
+                        />
+                        {/* <Text style={{fontWeight: 'bold'}}>La Piconera</Text> */}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            paddingHorizontal: 20,
+                            paddingVertical: 10,
+                            borderRadius: "20",
+                            marginTop: 1,
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold", color: "white" }}>
+                            Rosso
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                {pickEmpresa !== null && (
+                  <View style={{ width: "100%" }}>
+                    <Button
+                      title="Ver otra empresa"
+                      onPress={() => {
+                        setPickEmpresa(null);
+                      }}
+                    />
+                    <View
+                      style={{
+                        backgroundColor: "#323432",
+                        width: "98%",
+                        alignItems: "center",
+                        borderRadius: 15,
+                        marginVertical: 10,
+                        paddingVertical: 10,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 22,
+                          color: "white",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {empresa.nombreEmpresa}
+                      </Text>
+                    </View>
+                    <Text style={{ fontSize: 22 }}>Precio copa</Text>
+                    <TextInput
+                      placeholder={`${empresa.precioCopa}`}
+                      style={{
+                        marginTop: 5,
+                        borderWidth: 0.5,
+                        // width: "100%",
+                        padding: 10,
+                        borderRadius: 10,
+                        textAlign: "center",
+                        fontWeight: "bold",
+                        fontSize: 22,
+                        marginBottom: 5,
+                      }}
+                      onChangeText={(text) => setPrecioCopa(text)}
+                    />
+                    <Text style={{ fontSize: 22 }}>Rango tikada (metros)</Text>
+                    <TextInput
+                      placeholder={`${empresa.rangoTikada}`}
+                      style={{
+                        marginTop: 5,
+                        borderWidth: 0.5,
+                        // width: "100%",
+                        padding: 10,
+                        borderRadius: 10,
+                        textAlign: "center",
+                        fontWeight: "bold",
+                        fontSize: 22,
+                        marginBottom: 5,
+                      }}
+                      onChangeText={(text) => setRangoTikada(text)}
+                    />
+                    <Button
+                      title="Editar"
+                      style={{ backgroundColor: "red", marginTop: 5 }}
+                      onPress={() => {
+                        bottomSheetModalRef.current?.dismiss();
+                        setPickEmpresa(null)
+
+                        editEmpresa(empresa._id, {
+                          ...empresa,
+                          precioCopa,
+                          rangoTikada,
+                        });
+                      }}
+                    />
+                  </View>
+                )}
               </View>
             </ScrollView>
           </View>

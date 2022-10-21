@@ -1,12 +1,41 @@
 import { Alert } from "react-native";
 import Toast from "react-native-toast-message";
 
-export const API = "http://192.168.0.14:4000/api";
-export const URL = "http://192.168.0.14:4000/";
-// export const API = "https://lapiconera.herokuapp.com/api"
-// export const URL = "https://lapiconera.herokuapp.com/";
-
-
+// export const API = "http://192.168.0.14:4000/api";
+// export const URL = "http://192.168.0.14:4000/";
+export const API = "https://lapiconera.herokuapp.com/api"
+export const URL = "https://lapiconera.herokuapp.com/";
+export const editEmpresa = async (id, action) =>{
+try {
+  const data = await fetch(`${API}/empresa/editarEmpresa/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(action),
+  })
+} catch (error) {
+  console.log(error)
+}
+}
+export const getEmpresa = async (id)=>{
+  try {
+    const data = await fetch(`${API}/empresa/${id}`)
+    return await data.json();
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const buscarEmpleados = async (action) =>{
+  try {
+    const data = await fetch(`${API}/empleados/buscarEmpleados`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(action),
+    })
+    return await data.json();
+  } catch (error) {
+    console.log(error)
+  }
+  }
 export const loadEmpeladoTikadaActual = async (id) =>{
 try {
   const data = await fetch(`${API}/tikada/tikadaActual/${id}`);

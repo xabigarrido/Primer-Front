@@ -16,7 +16,9 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import * as ImagePicker from "expo-image-picker";
-import fondo from "../assets/fondoScreen.jpg";
+import fondoPiconera from "../assets/fondoScreen.jpg";
+import fondoAntique from "../assets/fondoScreenAntique.png";
+import fondoRosso from "../assets/fondoScreenRosso.png";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import React, { useState, useEffect, useRef } from "react";
@@ -51,6 +53,7 @@ const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const isFocus = useIsFocused();
   const [asyncData, setAsyncData] = useState(null);
+  const [fondoMostrar, setFondoMostrar] = useState(null)
 
   const getData = async () => {
     try {
@@ -66,6 +69,19 @@ const HomeScreen = ({ navigation }) => {
       console.log(e);
     }
   };
+  useEffect(()=>{
+    if(user.empresa == "6350346b5e2286c0a43467c4"){
+      setFondoMostrar(fondoPiconera) 
+    }
+    if(user.empresa == "635034a45e2286c0a43467c6"){
+      setFondoMostrar(fondoAntique) 
+
+    }
+    if(user.empresa == "635034ab5e2286c0a43467c8"){
+      setFondoMostrar(fondoRosso) 
+
+    }
+  },[])
   useEffect(() => {
     getData();
     return () => {
@@ -181,7 +197,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <BottomSheetModalProvider>
       <ImageBackground
-        source={fondo}
+        source={fondoMostrar}
         resizeMode="cover"
         style={{ flex: 1, justifyContent: "center" }}
       >

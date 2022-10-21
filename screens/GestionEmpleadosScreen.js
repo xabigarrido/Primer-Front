@@ -13,6 +13,9 @@ import ImageLoad from "react-native-image-progress";
 import ProgressBar from "react-native-progress/Bar";
 import ubicacion from "../assets/ubicacion.jpg";
 import * as ImagePicker from "expo-image-picker";
+import Piconera from "../assets/Logo-Piconera.png";
+import Antique from "../assets/Logo-Antique.png";
+import Rosso from "../assets/Logo-ROSSO.png";
 
 import { FontAwesome } from "@expo/vector-icons";
 import botella from "../assets/botella.png";
@@ -38,7 +41,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import { Button } from "@react-native-material/core";
 import { MaterialCommunityIcons, Fontisto } from "@expo/vector-icons";
-import {socket} from '../socket'
+import { socket } from "../socket";
 import {
   addEmpleado,
   deleteEmpleado,
@@ -52,8 +55,10 @@ import {
   deleteTikada,
   editarEmpleadoApi,
   API,
+  buscarEmpleados,
 } from "../api";
 import moment from "moment";
+import { color } from "react-native-reanimated";
 const GestionEmpleadosScreen = ({ navigation }) => {
   const [empleados, setEmpleados] = useState([]);
   const [pickCategory, setPickCategory] = useState("Empleado");
@@ -86,7 +91,8 @@ const GestionEmpleadosScreen = ({ navigation }) => {
   const [editarEmpleado, setEditarEmpleado] = useState(null);
   const [listImage, setListImage] = useState([]);
   const [idTikada, setIdTikada] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [pickEmpresa, setPickEmpresa] = useState(null);
+  const [verEmpresa, setVerEmpresa] = useState(false);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -164,20 +170,18 @@ const GestionEmpleadosScreen = ({ navigation }) => {
     loadRangos();
   }, [empleados]);
 
-  useEffect(()=>{
-    socket.on('servidor:tikadaEntrada',()=>{
+  useEffect(() => {
+    socket.on("servidor:tikadaEntrada", () => {
       loadEmpleados();
-    })
-    socket.on('servidor:tikadaSalida',()=>{
+    });
+    socket.on("servidor:tikadaSalida", () => {
       loadEmpleados();
-    })
-    return ()=>{
-      socket.off('servidor:tikadaEntrada')
-      socket.off('servidor:tikadaSalida')
-
-      
-    }
-  },[])
+    });
+    return () => {
+      socket.off("servidor:tikadaEntrada");
+      socket.off("servidor:tikadaSalida");
+    };
+  }, []);
   const handleLoadTikadaEmpleado = async () => {
     if (pickEmpleado != null && pickEmpleado.tikado == true) {
       const data = await loadEmpeladoTikadaActual(pickEmpleado._id);
@@ -219,6 +223,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
       rango: pickCategory,
       cuentaBancaria: "Numero cuenta bancaria",
       telefono: numeroEmpleado,
+      empresa: pickEmpresa || "6350346b5e2286c0a43467c4", //piconeraId
     };
     const data = await addEmpleado(newEmpleado);
     if (data.length > 0) {
@@ -232,7 +237,8 @@ const GestionEmpleadosScreen = ({ navigation }) => {
 
     if (data.token) {
       setCrearEmpleado(false);
-      loadEmpleados();
+      setVerEmpresa(false)
+      // loadEmpleados();
       // setEmpleados([...empleados, newEmpleado]);
       bottomSheetModalRef.current?.dismiss();
       return Toast.show({
@@ -268,17 +274,13 @@ const GestionEmpleadosScreen = ({ navigation }) => {
     setListImage([]);
   };
   const handleEditarEmpleado = async () => {
-
     setEditarEmpleado((editarEmpleado.rango = pickCategoryEdit));
     await editarEmpleadoApi(editarEmpleado._id, editarEmpleado);
-
-
+    setVerEmpresa(false)
 
     if (listImage.length == 1) {
       await editFotoEmpleado(editarEmpleado._id, listImage);
     }
-
-
 
     setListImage([]);
     setEditarEmpleado(null);
@@ -288,7 +290,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
         element._id == editFotoEmpleado._id ? editarEmpleado : element
       )
     );
-    loadEmpleados()
+    loadEmpleados();
     return bottomSheetModalRef.current?.dismiss();
   };
 
@@ -429,23 +431,40 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                 <ScrollView
                   contentContainerStyle={{ flexGrow: 1, alignItems: "center" }}
                 >
-                  <Button
-                    title="Crear Empleado"
-                    onPress={() => {
-    setEditarEmpleado(null);
-    setPickEmpleado(null)
-                      
-                      setCrearEmpleado(true);
-                      handlePresentModal();
-                    }}
-                    style={{
-                      width: "95%",
-                      height: 50,
-                      marginTop: 10,
-                      backgroundColor: "red",
-                      justifyContent: "center",
-                    }}
-                  />
+                  {verEmpresa == true && (
+                    <Button
+                      title="Crear Empleado"
+                      onPress={() => {
+                        setEditarEmpleado(null);
+                        setPickEmpleado(null);
+
+                        setCrearEmpleado(true);
+                        handlePresentModal();
+                      }}
+                      style={{
+                        width: "95%",
+                        height: 50,
+                        marginTop: 10,
+                        backgroundColor: "red",
+                        justifyContent: "center",
+                      }}
+                    />
+                  )}
+                  {verEmpresa == true && (
+                    <Button
+                      title="Ver otra empresa"
+                      onPress={() => {
+                        setVerEmpresa(false);
+                      }}
+                      style={{
+                        width: "95%",
+                        height: 50,
+                        marginTop: 5,
+                        backgroundColor: "orange",
+                        justifyContent: "center",
+                      }}
+                    />
+                  )}
                   <View
                     style={{
                       flexDirection: "row",
@@ -453,267 +472,398 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                       justifyContent: "center",
                     }}
                   >
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
+                    {verEmpresa == false && (
+                      <View
                         style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          height: "100%",
                         }}
                       >
-                        ADMINISTRADORES
-                      </Text>
-                    </View>
-                    {listEmpleados(rangoAdmin)}
+                        <TouchableOpacity
+                          onPress={async () => {
+                            setVerEmpresa(true);
+                            const data = await buscarEmpleados({
+                              empresa: "6350346b5e2286c0a43467c4",
+                            });
+                            setEmpleados(data);
+                          }}
+                        >
+                          <View
+                            style={{ alignItems: "center", marginBottom: 10 }}
+                          >
+                            <Image
+                              source={Piconera}
+                              style={{
+                                borderRadius: 50,
+                                height: 120,
+                                width: 120,
+                                // borderWidth: 0.3,
+                              }}
+                            />
+                            <View
+                              style={{
+                                backgroundColor: "#323432",
+                                paddingHorizontal: 20,
+                                paddingVertical: 10,
+                                borderRadius: "20",
+                                marginTop: 1,
+                              }}
+                            >
+                              <Text
+                                style={{ fontWeight: "bold", color: "white" }}
+                              >
+                                La Piconera
+                              </Text>
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={async () => {
+                            setVerEmpresa(true);
+                            const data = await buscarEmpleados({
+                              empresa: "635034a45e2286c0a43467c6",
+                            });
+                            setEmpleados(data);
+                          }}
+                        >
+                          <View
+                            style={{ alignItems: "center", marginBottom: 10 }}
+                          >
+                            <Image
+                              source={Antique}
+                              style={{
+                                borderRadius: 50,
+                                height: 120,
+                                width: 120,
+                                // borderWidth: 0.3,
+                              }}
+                            />
+                            {/* <Text style={{fontWeight: 'bold'}}>La Piconera</Text> */}
+                            <View
+                              style={{
+                                backgroundColor: "#323432",
+                                paddingHorizontal: 20,
+                                paddingVertical: 10,
+                                borderRadius: "20",
+                                marginTop: 1,
+                              }}
+                            >
+                              <Text
+                                style={{ fontWeight: "bold", color: "white" }}
+                              >
+                                Antique
+                              </Text>
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={async () => {
+                            setVerEmpresa(true);
 
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        ENCARGADOS
-                      </Text>
-                    </View>
-                    {listEmpleados(rangoEncargado)}
+                            const data = await buscarEmpleados({
+                              empresa: "635034ab5e2286c0a43467c8",
+                            });
+                            setEmpleados(data);
+                          }}
+                        >
+                          <View
+                            style={{ alignItems: "center", marginBottom: 10 }}
+                          >
+                            <Image
+                              source={Rosso}
+                              style={{
+                                borderRadius: 50,
+                                height: 120,
+                                width: 120,
+                                // borderWidth: 0.3,
+                              }}
+                            />
+                            {/* <Text style={{fontWeight: 'bold'}}>La Piconera</Text> */}
+                            <View
+                              style={{
+                                backgroundColor: "#323432",
+                                paddingHorizontal: 20,
+                                paddingVertical: 10,
+                                borderRadius: "20",
+                                marginTop: 1,
+                              }}
+                            >
+                              <Text
+                                style={{ fontWeight: "bold", color: "white" }}
+                              >
+                                Rosso
+                              </Text>
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                    {verEmpresa == true && (
+                      <>
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            ADMINISTRADORES
+                          </Text>
+                        </View>
+                        {listEmpleados(rangoAdmin)}
 
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        CAMAREROS BARRAS
-                      </Text>
-                    </View>
-                    {listEmpleados(rangoCamareroBarra)}
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        BANDEJAS
-                      </Text>
-                    </View>
-                    {listEmpleados(rangoBandeja)}
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        CACHIMBEROS
-                      </Text>
-                    </View>
-                    {listEmpleados(rangoCachimbero)}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            ENCARGADOS
+                          </Text>
+                        </View>
+                        {listEmpleados(rangoEncargado)}
 
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        DJ'S
-                      </Text>
-                    </View>
-                    {listEmpleados(rangoDj)}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            CAMAREROS BARRAS
+                          </Text>
+                        </View>
+                        {listEmpleados(rangoCamareroBarra)}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            BANDEJAS
+                          </Text>
+                        </View>
+                        {listEmpleados(rangoBandeja)}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            CACHIMBEROS
+                          </Text>
+                        </View>
+                        {listEmpleados(rangoCachimbero)}
 
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        RELACIONES PUBLICAS
-                      </Text>
-                    </View>
-                    {listEmpleados(rangoRrpp)}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            DJ'S
+                          </Text>
+                        </View>
+                        {listEmpleados(rangoDj)}
 
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        MANTENIMIENTO
-                      </Text>
-                    </View>
-                    {listEmpleados(rangoMantenimiento)}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            RELACIONES PUBLICAS
+                          </Text>
+                        </View>
+                        {listEmpleados(rangoRrpp)}
 
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        PORTEROS
-                      </Text>
-                    </View>
-                    {listEmpleados(rangoPortero)}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            MANTENIMIENTO
+                          </Text>
+                        </View>
+                        {listEmpleados(rangoMantenimiento)}
 
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        LIMPIEZA
-                      </Text>
-                    </View>
-                    {listEmpleados(rangoLimpieza)}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            PORTEROS
+                          </Text>
+                        </View>
+                        {listEmpleados(rangoPortero)}
 
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        EMPLEADOS
-                      </Text>
-                    </View>
-                    {listEmpleados(rangoEmpleado)}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            LIMPIEZA
+                          </Text>
+                        </View>
+                        {listEmpleados(rangoLimpieza)}
 
-                    <View
-                      style={{
-                        backgroundColor: "#323432",
-                        width: "98%",
-                        alignItems: "center",
-                        borderRadius: 15,
-                        marginVertical: 10,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        TODOS
-                      </Text>
-                    </View>
-                    {listEmpleados(empleados)}
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            EMPLEADOS
+                          </Text>
+                        </View>
+                        {listEmpleados(rangoEmpleado)}
+
+                        <View
+                          style={{
+                            backgroundColor: "#323432",
+                            width: "98%",
+                            alignItems: "center",
+                            borderRadius: 15,
+                            marginVertical: 10,
+                            paddingVertical: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            TODOS
+                          </Text>
+                        </View>
+                        {listEmpleados(empleados)}
+                      </>
+                    )}
                   </View>
                 </ScrollView>
               </View>
@@ -747,7 +897,6 @@ const GestionEmpleadosScreen = ({ navigation }) => {
         >
           <View style={style.contentContainer}>
             <View style={style.containerModal}>
-
               {editarEmpleado == null && pickEmpleado != null && (
                 <ScrollView
                   contentContainerStyle={{ flexGrow: 1, alignItems: "center" }}
@@ -873,7 +1022,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                                       if (element._id == pickEmpleado._id) {
                                         element.tikado = false;
                                       }
-                                      return element
+                                      return element;
                                     })
                                   );
                                   bottomSheetModalRef.current?.dismiss();
@@ -939,7 +1088,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                                       if (element._id == pickEmpleado._id) {
                                         element.tikado = false;
                                       }
-                                      return element
+                                      return element;
                                     })
                                   );
                                   bottomSheetModalRef.current?.dismiss();
@@ -1075,15 +1224,13 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                       }}
                     >
                       <TouchableOpacity
-                        onPress={() =>
-                  {
-                    setPickEmpleado(null)
-                    bottomSheetModalRef.current?.dismiss();
-                    navigation.navigate("TikadasEmpleadoById", {
-                      idEmpleado: pickEmpleado._id,
-                    })
-                  }
-                        }
+                        onPress={() => {
+                          setPickEmpleado(null);
+                          bottomSheetModalRef.current?.dismiss();
+                          navigation.navigate("TikadasEmpleadoById", {
+                            idEmpleado: pickEmpleado._id,
+                          });
+                        }}
                       >
                         <View style={{ alignItems: "center" }}>
                           <Image
@@ -1114,6 +1261,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                         onPress={() => {
                           setEditarEmpleado(pickEmpleado);
                           setPickCategoryEdit(pickEmpleado.rango);
+                          setPickEmpresa(pickEmpleado.empresa);
                           // setnombreEmpleado()
                           // setApellidosEmpleado()
                           // setEmailEmpleado()
@@ -1601,7 +1749,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                       borderRadius: 20,
                       borderWidth: 0.3,
                       backgroundColor: "#EBEBEB",
-                      marginBottom: 20,
+                      marginBottom: 5,
                     }}
                     selectedValue={pickCategoryEdit}
                     onValueChange={(itemValue, itemIndex) =>
@@ -1627,6 +1775,83 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                     <Picker.Item label="Encargado" value="Encargado" />
                     <Picker.Item label="Administrador" value="Administrador" />
                   </Picker>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-around",
+                      width: "100%",
+                      marginBottom: 5,
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        setPickEmpresa("6350346b5e2286c0a43467c4");
+                        editarEmpleado.empresa = "6350346b5e2286c0a43467c4";
+                      }}
+                    >
+                      <Image
+                        source={Piconera}
+                        style={{
+                          borderRadius: 50,
+                          height: 60,
+                          width: 60,
+                          // borderWidth: 0.3,
+                          borderWidth:
+                            pickEmpresa == "6350346b5e2286c0a43467c4" ? 6 : 0,
+                          borderColor:
+                            pickEmpresa == "6350346b5e2286c0a43467c4"
+                              ? "green"
+                              : "black",
+                        }}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setPickEmpresa("635034a45e2286c0a43467c6");
+
+                        editarEmpleado.empresa = "635034a45e2286c0a43467c6";
+                      }}
+                    >
+                      <Image
+                        source={Antique}
+                        style={{
+                          borderRadius: 50,
+                          height: 60,
+                          width: 60,
+                          borderWidth: 0.3,
+                          borderWidth:
+                            pickEmpresa == "635034a45e2286c0a43467c6" ? 6 : 0,
+                          borderColor:
+                            pickEmpresa == "635034a45e2286c0a43467c6"
+                              ? "green"
+                              : "black",
+                        }}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setPickEmpresa("635034ab5e2286c0a43467c8");
+
+                        editarEmpleado.empresa = "635034ab5e2286c0a43467c8";
+                      }}
+                    >
+                      <Image
+                        source={Rosso}
+                        style={{
+                          borderRadius: 50,
+                          height: 60,
+                          width: 60,
+                          borderWidth: 0.3,
+                          borderWidth:
+                            pickEmpresa == "635034ab5e2286c0a43467c8" ? 6 : 0,
+                          borderColor:
+                            pickEmpresa == "635034ab5e2286c0a43467c8"
+                              ? "green"
+                              : "black",
+                        }}
+                      />
+                    </TouchableOpacity>
+                  </View>
                   <Button
                     title="Editar empleado"
                     onPress={() => {
@@ -1642,7 +1867,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                   />
                 </View>
               )}
-                            {crearEmpleado == true && (
+              {crearEmpleado == true && (
                 <View style={{ width: "100%" }}>
                   <TextInput
                     placeholder="Nombre empleado"
@@ -1819,6 +2044,75 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                     <Picker.Item label="Encargado" value="Encargado" />
                     <Picker.Item label="Administrador" value="Administrador" />
                   </Picker>
+                  <View style={{flexDirection: 'row', justifyContent: 'space-around', marginBottom: 2}}>
+
+                  <TouchableOpacity
+                      onPress={() => {
+                        setPickEmpresa("6350346b5e2286c0a43467c4");
+                      }}
+                    >
+                      <Image
+                        source={Piconera}
+                        style={{
+                          borderRadius: 50,
+                          height: 60,
+                          width: 60,
+                          // borderWidth: 0.3,
+                          borderWidth:
+                            pickEmpresa == "6350346b5e2286c0a43467c4" ? 6 : 0,
+                          borderColor:
+                            pickEmpresa == "6350346b5e2286c0a43467c4"
+                              ? "green"
+                              : "black",
+                        }}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setPickEmpresa("635034a45e2286c0a43467c6");
+
+                      }}
+                    >
+                      <Image
+                        source={Antique}
+                        style={{
+                          borderRadius: 50,
+                          height: 60,
+                          width: 60,
+                          borderWidth: 0.3,
+                          borderWidth:
+                            pickEmpresa == "635034a45e2286c0a43467c6" ? 6 : 0,
+                          borderColor:
+                            pickEmpresa == "635034a45e2286c0a43467c6"
+                              ? "green"
+                              : "black",
+                        }}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setPickEmpresa("635034ab5e2286c0a43467c8");
+
+                      }}
+                    >
+                      <Image
+                        source={Rosso}
+                        style={{
+                          borderRadius: 50,
+                          height: 60,
+                          width: 60,
+                          borderWidth: 0.3,
+                          borderWidth:
+                            pickEmpresa == "635034ab5e2286c0a43467c8" ? 6 : 0,
+                          borderColor:
+                            pickEmpresa == "635034ab5e2286c0a43467c8"
+                              ? "green"
+                              : "black",
+                        }}
+                      />
+                    </TouchableOpacity>
+                    </View>
+
                   <Button
                     title="Crear Empleado"
                     onPress={() => {
