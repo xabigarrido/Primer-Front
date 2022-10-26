@@ -281,7 +281,7 @@ const HomeScreen = ({ navigation }) => {
                           style={{ width: 80, height: 80, borderRadius: 15 }}
                         />
                         <View style={styles.ventanaTextBotones}>
-                          <Text style={styles.textBoton}>Gestion Caja</Text>
+                          <Text style={styles.textBoton}>Gestion de Caja</Text>
                         </View>
                       </View>
                     </TouchableOpacity>

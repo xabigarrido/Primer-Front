@@ -9,12 +9,19 @@
     },
     "preview": {
       "ios": {
-        "simulator": true
+        "simulator": true,
+      "distribution": "internal"
       }
     },
     "production": {}
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios":{
+        "appleId": "garridoxabi@icloud.com",
+        "ascAppId": "6444025898",
+        "appleTeamId": "8G5A2CXXVA"
+      }
+    }
   }
 }
