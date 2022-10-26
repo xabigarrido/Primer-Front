@@ -1,68 +1,4 @@
-// import "react-native-gesture-handler";
-
-// import React, { useCallback, useMemo, useRef, useEffect } from "react";
-// import { View, Text, StyleSheet, Button } from "react-native";
-// import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-// import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-// const App = () => {
-//   // ref
-//   const bottomSheetModalRef = useRef(null);
-//   useEffect(() => {
-//     bottomSheetModalRef.current?.present();
-//   }, [bottomSheetModalRef]);
-
-//   // variables
-//   const snapPoints = useMemo(() => ["25%", "50%"], []);
-
-//   // callbacks
-//   const handlePresentModalPress = useCallback(() => {
-//     bottomSheetModalRef.current?.snapToIndex(0);
-//   }, []);
-//   const handleSheetChanges = useCallback((index: number) => {
-//     // console.log("handleSheetChanges", index);
-//   }, []);
-
-//   // renders
-//   return (
-//     <View style={styles.container}>
-//       <Button onPress={handlePresentModalPress} title="Present Modal" color="black" />
-//       <BottomSheetModal ref={bottomSheetModalRef} index={-1} snapPoints={snapPoints} onChange={handleSheetChanges} enableDismissOnClose={false}>
-//         <View style={styles.contentContainer}>
-//           <Text>Awesome 🎉</Text>
-//         </View>
-//       </BottomSheetModal>
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 24,
-//     justifyContent: "center",
-//     backgroundColor: "grey",
-//   },
-//   contentContainer: {
-//     flex: 1,
-//     alignItems: "center",
-//   },
-// });
-
-// export default () => {
-//   return (
-//     <BottomSheetModalProvider>
-//       <GestureHandlerRootView style={{ flex: 1 }}>
-//         <App />
-//       </GestureHandlerRootView>
-//     </BottomSheetModalProvider>
-//   );
-// };
-
-import {
-  NativeViewGestureHandler,
-  ScrollView,
-} from "react-native-gesture-handler";
+import { ScrollView } from "react-native-gesture-handler";
 import "react-native-get-random-values";
 import {
   View,
@@ -78,10 +14,10 @@ import {
   TouchableOpacity,
 } from "@gorhom/bottom-sheet";
 import React, { useRef, useState, useEffect } from "react";
-
-import fondo from "../assets/fondoScreen.jpg";
+import fondoPiconera from "../assets/fondoScreen.jpg";
+import fondoAntique from "../assets/fondoScreenAntique.png";
+import fondoRosso from "../assets/fondoScreenRosso.png";
 import BotonHome from "../components/BotonHome";
-import Toast from "react-native-toast-message";
 import moment from "moment";
 import empleadosImg from "../assets/empleados.png";
 import ajustesTools from "../assets/tools.png";
@@ -90,6 +26,7 @@ import Antique from "../assets/Logo-Antique.png";
 import Rosso from "../assets/Logo-ROSSO.png";
 import { Button } from "@react-native-material/core";
 import { getEmpleados, getEmpresa, URL, editEmpresa } from "../api";
+import { useSelector } from "react-redux";
 
 const GestionEmpresaScreen = ({ navigation }) => {
   const bottomSheetModalRef = useRef(null);
@@ -99,6 +36,8 @@ const GestionEmpresaScreen = ({ navigation }) => {
   const [empresa, setEmpresa] = useState({});
   const [precioCopa, setPrecioCopa] = useState(0);
   const [rangoTikada, setRangoTikada] = useState(0);
+  const [fondoMostrar, setFondoMostrar] = useState(null);
+  const user = useSelector((state) => state.userStore);
 
   const loadEmpresa = async (id) => {
     const data = await getEmpresa(id);
@@ -108,8 +47,8 @@ const GestionEmpresaScreen = ({ navigation }) => {
   useEffect(() => {
     if (pickEmpresa != null) {
       loadEmpresa(pickEmpresa);
-      setPrecioCopa(pickEmpresa.precioCopa)
-      setRangoTikada(pickEmpresa.rangoTikada)
+      setPrecioCopa(pickEmpresa.precioCopa);
+      setRangoTikada(pickEmpresa.rangoTikada);
     }
     return () => {};
   }, [pickEmpresa]);
@@ -128,6 +67,17 @@ const GestionEmpresaScreen = ({ navigation }) => {
     loadEmpleados();
     return () => {};
   }, []);
+  useEffect(() => {
+    if (user.empresa == "6350346b5e2286c0a43467c4") {
+      setFondoMostrar(fondoPiconera);
+    }
+    if (user.empresa == "635034a45e2286c0a43467c6") {
+      setFondoMostrar(fondoAntique);
+    }
+    if (user.empresa == "635034ab5e2286c0a43467c8") {
+      setFondoMostrar(fondoRosso);
+    }
+  }, []);
 
   const calcular = () => {
     const timeEntrada = moment.unix("1665507165");
@@ -139,7 +89,7 @@ const GestionEmpresaScreen = ({ navigation }) => {
   return (
     <BottomSheetModalProvider>
       <ImageBackground
-        source={fondo}
+        source={fondoMostrar}
         resizeMode="cover"
         style={{ flex: 1, justifyContent: "center" }}
       >
@@ -337,7 +287,7 @@ const GestionEmpresaScreen = ({ navigation }) => {
                             backgroundColor: "#323432",
                             paddingHorizontal: 20,
                             paddingVertical: 10,
-                            borderRadius: "20",
+                            borderRadius: 20,
                             marginTop: 1,
                           }}
                         >
@@ -368,7 +318,7 @@ const GestionEmpresaScreen = ({ navigation }) => {
                             backgroundColor: "#323432",
                             paddingHorizontal: 20,
                             paddingVertical: 10,
-                            borderRadius: "20",
+                            borderRadius: 20,
                             marginTop: 1,
                           }}
                         >
@@ -399,7 +349,7 @@ const GestionEmpresaScreen = ({ navigation }) => {
                             backgroundColor: "#323432",
                             paddingHorizontal: 20,
                             paddingVertical: 10,
-                            borderRadius: "20",
+                            borderRadius: 20,
                             marginTop: 1,
                           }}
                         >
@@ -476,7 +426,7 @@ const GestionEmpresaScreen = ({ navigation }) => {
                       style={{ backgroundColor: "red", marginTop: 5 }}
                       onPress={() => {
                         bottomSheetModalRef.current?.dismiss();
-                        setPickEmpresa(null)
+                        setPickEmpresa(null);
 
                         editEmpresa(empresa._id, {
                           ...empresa,

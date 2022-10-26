@@ -10,7 +10,11 @@ import {
 } from "react-native";
 import React, { useRef, useState, useEffect } from "react";
 
-import fondo from "../assets/fondoScreen.jpg";
+import fondoPiconera from "../assets/fondoScreen.jpg";
+import fondoAntique from "../assets/fondoScreenAntique.png";
+import fondoRosso from "../assets/fondoScreenRosso.png";
+import { useSelector } from "react-redux";
+
 import BotonHome from "../components/BotonHome";
 import Toast from "react-native-toast-message";
 import moment from "moment";
@@ -37,6 +41,9 @@ const TikadasEmpleados = ({ route }) => {
   const [pickYear, setPickYear] = useState(moment().format("YYYY"));
   const [search, setSearch] = useState(false);
   const [pickCategory, setPickCategory] = useState("Empleado");
+  const user = useSelector((state) => state.userStore);
+  const [fondoMostrar, setFondoMostrar] = useState(null);
+
   const textInputRef = useRef();
   function handlePresentModal() {
     bottomSheetModalRef.current?.present();
@@ -61,6 +68,19 @@ const TikadasEmpleados = ({ route }) => {
       loadTikadas();
     }
   }, [sueldo]);
+  useEffect(()=>{
+    if(user.empresa == "6350346b5e2286c0a43467c4"){
+      setFondoMostrar(fondoPiconera) 
+    }
+    if(user.empresa == "635034a45e2286c0a43467c6"){
+      setFondoMostrar(fondoAntique) 
+
+    }
+    if(user.empresa == "635034ab5e2286c0a43467c8"){
+      setFondoMostrar(fondoRosso) 
+
+    }
+  },[])
   const handleSearch = () => {
     loadTikadas();
     setSearch(true);
@@ -164,25 +184,30 @@ const TikadasEmpleados = ({ route }) => {
             <View>
               <Text style={{ fontSize: 24, fontWeight: "bold" }}>Tikada </Text>
               <Text
-                style={{ fontSize: 28, fontWeight: "bold", color: "#FF7000", textAlign: 'right'}}
+                style={{
+                  fontSize: 28,
+                  fontWeight: "bold",
+                  color: "#FF7000",
+                  textAlign: "right",
+                }}
               >
                 #{index + 1}{" "}
               </Text>
-              <View style={{alignItems: 'center'}}>
-              <TouchableOpacity
-                onPress={() =>
-                  handleDelete(
-                    tikada._id,
-                    DineroGanado(tikada.totalTrabajado, sueldoActual)
-                  )
-                }
-              >
-                <MaterialCommunityIcons
-                  name="delete-circle"
-                  size={30}
-                  color="red"
-                />
-              </TouchableOpacity>
+              <View style={{ alignItems: "center" }}>
+                <TouchableOpacity
+                  onPress={() =>
+                    handleDelete(
+                      tikada._id,
+                      DineroGanado(tikada.totalTrabajado, sueldoActual)
+                    )
+                  }
+                >
+                  <MaterialCommunityIcons
+                    name="delete-circle"
+                    size={30}
+                    color="red"
+                  />
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -461,7 +486,7 @@ const TikadasEmpleados = ({ route }) => {
     <Root>
       <BottomSheetModalProvider>
         <ImageBackground
-          source={fondo}
+          source={fondoMostrar}
           resizeMode="cover"
           style={{ flex: 1, justifyContent: "center" }}
         >
@@ -746,7 +771,12 @@ const TikadasEmpleados = ({ route }) => {
                               >
                                 {tikadas.length} tikadas en{" "}
                               </Text>
-                              <Text style={{fontSize: Platform.OS == "android" ? 16 : 20, fontWeight: "700" }}>
+                              <Text
+                                style={{
+                                  fontSize: Platform.OS == "android" ? 16 : 20,
+                                  fontWeight: "700",
+                                }}
+                              >
                                 {pickMes.toLocaleUpperCase()} {pickYear}
                               </Text>
                             </View>

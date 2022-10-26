@@ -155,6 +155,8 @@ export default function App({ navigation, route }) {
       });
       console.log(datosMesa);
       editCopasBotellas(datosMesa)
+      setDatosMesa({...datosMesa, copas: 0, botellas: 0})
+
       // navigation.navigate("TabScreen");
       // navigation.navigate("EstadoMesaScreen", { id: route.params.idMesa });
     } else {

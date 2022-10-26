@@ -6,11 +6,8 @@ import {
   TextInput,
   Image,
   Linking,
-  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import ImageLoad from "react-native-image-progress";
-import ProgressBar from "react-native-progress/Bar";
 import ubicacion from "../assets/ubicacion.jpg";
 import * as ImagePicker from "expo-image-picker";
 import Piconera from "../assets/Logo-Piconera.png";
@@ -24,15 +21,15 @@ import editarEmpleadoImg from "../assets/editarEmpleado.jpg";
 import cruz from "../assets/cruz.png";
 import activar from "../assets/activar.png";
 import {
-  NativeViewGestureHandler,
   ScrollView,
 } from "react-native-gesture-handler";
 import "react-native-get-random-values";
 import React, { useRef, useState, useEffect } from "react";
 import { Picker } from "@react-native-picker/picker";
 import { Root, Popup } from "react-native-popup-confirm-toast";
-
-import fondo from "../assets/fondoScreen.jpg";
+import fondoPiconera from "../assets/fondoScreen.jpg";
+import fondoAntique from "../assets/fondoScreenAntique.png";
+import fondoRosso from "../assets/fondoScreenRosso.png";
 import BotonHome from "../components/BotonHome";
 import Toast from "react-native-toast-message";
 import {
@@ -58,7 +55,8 @@ import {
   buscarEmpleados,
 } from "../api";
 import moment from "moment";
-import { color } from "react-native-reanimated";
+import { useSelector } from "react-redux";
+
 const GestionEmpleadosScreen = ({ navigation }) => {
   const [empleados, setEmpleados] = useState([]);
   const [pickCategory, setPickCategory] = useState("Empleado");
@@ -93,6 +91,9 @@ const GestionEmpleadosScreen = ({ navigation }) => {
   const [idTikada, setIdTikada] = useState(null);
   const [pickEmpresa, setPickEmpresa] = useState(null);
   const [verEmpresa, setVerEmpresa] = useState(false);
+  const [fondoMostrar, setFondoMostrar] = useState(null)
+const user = useSelector((state) => state.userStore);
+
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -169,7 +170,19 @@ const GestionEmpleadosScreen = ({ navigation }) => {
   useEffect(() => {
     loadRangos();
   }, [empleados]);
+  useEffect(()=>{
+    if(user.empresa == "6350346b5e2286c0a43467c4"){
+      setFondoMostrar(fondoPiconera) 
+    }
+    if(user.empresa == "635034a45e2286c0a43467c6"){
+      setFondoMostrar(fondoAntique) 
 
+    }
+    if(user.empresa == "635034ab5e2286c0a43467c8"){
+      setFondoMostrar(fondoRosso) 
+
+    }
+  },[])
   useEffect(() => {
     socket.on("servidor:tikadaEntrada", () => {
       loadEmpleados();
@@ -216,7 +229,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
     const newEmpleado = {
       nombre: nombreEmpleado,
       apellidos: apellidosEmpleado,
-      email: emailEmpleado,
+      email: emailEmpleado.toLowerCase(),
       password,
       repassword: rePassword,
       dni: dniEmpleado,
@@ -405,7 +418,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
     <Root>
       <BottomSheetModalProvider>
         <ImageBackground
-          source={fondo}
+          source={fondoMostrar}
           resizeMode="cover"
           style={{ flex: 1, justifyContent: "center" }}
         >
@@ -506,7 +519,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                                 backgroundColor: "#323432",
                                 paddingHorizontal: 20,
                                 paddingVertical: 10,
-                                borderRadius: "20",
+                                borderRadius: 20,
                                 marginTop: 1,
                               }}
                             >
@@ -545,7 +558,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                                 backgroundColor: "#323432",
                                 paddingHorizontal: 20,
                                 paddingVertical: 10,
-                                borderRadius: "20",
+                                borderRadius: 20,
                                 marginTop: 1,
                               }}
                             >
@@ -585,7 +598,7 @@ const GestionEmpleadosScreen = ({ navigation }) => {
                                 backgroundColor: "#323432",
                                 paddingHorizontal: 20,
                                 paddingVertical: 10,
-                                borderRadius: "20",
+                                borderRadius: 20,
                                 marginTop: 1,
                               }}
                             >

@@ -79,17 +79,17 @@ export const reservaRecibida = async (id) => {
     console.log(error);
   }
 };
-export const getAllReservas = async () => {
+export const getAllReservas = async (empresa) => {
   try {
-    const data = await fetch(`${API}/reservas/getReservas`);
+    const data = await fetch(`${API}/reservas/getReservas/${empresa}`);
     return await data.json();
   } catch (error) {
     console.log(error);
   }
 };
-export const getReservas = async (dia) => {
+export const getReservas = async (dia, empresa) => {
   try {
-    const data = await fetch(`${API}/reservas/getReserva/${dia}`);
+    const data = await fetch(`${API}/reservas/getReserva/${dia}/${empresa}`);
     return await data.json();
   } catch (error) {
     console.log(error);

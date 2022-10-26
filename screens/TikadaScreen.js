@@ -134,7 +134,9 @@ import {
   loadEmpeladoTikadaActual,
   getEmpresa,
 } from "../api";
-import fondo from "../assets/fondoScreentikada.jpg";
+import fondoPiconera from "../assets/fondoScreentikada.png";
+import fondoAntique from "../assets/fondoScreentikadaAntique.png";
+import fondoRosso from "../assets/fondoScreentikadaRosso.png";
 import BotonHome from "../components/BotonHome";
 import Toast from "react-native-toast-message";
 import { getPreciseDistance } from "geolib";
@@ -148,6 +150,8 @@ export default function App({ navigation }) {
   const [tikadaActual, setTikadaActual] = useState(null);
   const [tiempoTrabajado, setTiempoTrabajado] = useState("");
   const [empresa, setEmpresa] = useState({});
+  const [fondoMostrar, setFondoMostrar] = useState(null);
+  const [locationEmpresa, setLocationEmpresa] = useState(null);
 
   const loadEmpresa = async () => {
     const data = await getEmpresa(user.empresa);
@@ -182,6 +186,9 @@ export default function App({ navigation }) {
           mes: moment().format("MMMM"),
           año: moment().format("YYYY"),
           comentario: "Ninguno",
+          empresa: user.empresa,
+          nombreEmpresa: user.nombreEmpresa,
+          empleado: user,
         };
         entradaTikada(newTikada);
         socket.emit("cliente:tikadaEntrada", { user });
@@ -241,6 +248,29 @@ export default function App({ navigation }) {
       setLocation(location);
     })();
   }, []);
+  useEffect(() => {
+    if (user.empresa == "6350346b5e2286c0a43467c4") {
+      setFondoMostrar(fondoPiconera);
+      setLocationEmpresa({
+        latitude: 37.3792876194074,
+        longitude: -6.000270583243217,
+      });
+    }
+    if (user.empresa == "635034a45e2286c0a43467c6") {
+      setFondoMostrar(fondoAntique);
+      setLocationEmpresa({
+        latitude: 37.40499830535985,
+        longitude: -6.000822333289576,
+      });
+    }
+    if (user.empresa == "635034ab5e2286c0a43467c8") {
+      setFondoMostrar(fondoRosso);
+      setLocationEmpresa({
+        latitude: 37.40499830535985,
+        longitude: -6.000822333289576,
+      });
+    }
+  }, []);
 
   useEffect(() => {
     if (location && location.coords) {
@@ -250,7 +280,10 @@ export default function App({ navigation }) {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           },
-          { latitude: 37.3792876194074, longitude: -6.000270583243217 } // piconera
+          {
+            latitude: locationEmpresa.latitude,
+            longitude: locationEmpresa.longitude,
+          } // piconera
           // { latitude: 37.38554265639422, longitude: -6.011333270138696 }
         )
       );
@@ -324,7 +357,7 @@ export default function App({ navigation }) {
   }
   return (
     <ImageBackground
-      source={fondo}
+      source={fondoMostrar}
       resizeMode="cover"
       style={{ flex: 1, justifyContent: "center" }}
     >

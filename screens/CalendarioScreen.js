@@ -21,7 +21,9 @@ import {
 } from "react-native-gesture-handler";
 import React, { useRef, useState, useEffect } from "react";
 import moment from "moment";
-import fondo from "../assets/fondoScreen.jpg";
+import fondoPiconera from "../assets/fondoScreen.jpg";
+import fondoAntique from "../assets/fondoScreenAntique.png";
+import fondoRosso from "../assets/fondoScreenRosso.png";
 import BotonHome from "../components/BotonHome";
 import Toast from "react-native-toast-message";
 import CalendarPicker from "react-native-calendar-picker";
@@ -55,17 +57,19 @@ const CalendarioScreen = () => {
   const [nombreReserva, setNombreReserva] = useState(0);
   const [fechasColor, setFechasColor] = useState([]);
   const [reservas, setReservas] = useState([]);
+const [fondoMostrar, setFondoMostrar] = useState(null)
+
 
   const loadReservas = async (date) => {
-    const data = await getReservas(date);
+    const data = await getReservas(date, user.empresa);
     setReservas(data);
     // loadColorReservas();
 
   };
 
   const loadColorReservas = async () => {
-    console.log("paso");
-    const data = await getAllReservas();
+    // console.log("paso");
+    const data = await getAllReservas(user.empresa);
     let arrayFechas = [];
     data.map((element) => arrayFechas.push(element.reservaDia));
     // console.log(arrayFechas.length);
@@ -113,6 +117,19 @@ const CalendarioScreen = () => {
 
     // return () => {};
   }, []);
+  useEffect(()=>{
+    if(user.empresa == "6350346b5e2286c0a43467c4"){
+      setFondoMostrar(fondoPiconera) 
+    }
+    if(user.empresa == "635034a45e2286c0a43467c6"){
+      setFondoMostrar(fondoAntique) 
+
+    }
+    if(user.empresa == "635034ab5e2286c0a43467c8"){
+      setFondoMostrar(fondoRosso) 
+
+    }
+  },[])
 
 
   // let today = moment();
@@ -162,13 +179,13 @@ const CalendarioScreen = () => {
   }, [bottomSheetModalRef]);
 
   const handleAddReserva = () => {
-    if (nombreReserva == 0)
-      return Alert.alert("Debe poner un nombre a la reserva");
-    if (numeroMesa == "") return Alert.alert("Debe poner un numero de mesa");
-    if (numeroPersonas == "")
-      return Alert.alert("Debe poner un numero de mesa");
-    if (numeroBotellas == "")
-      return Alert.alert("Debe poner un numero de botellas");
+    // if (nombreReserva == 0)
+    //   return Alert.alert("Debe poner un nombre a la reserva");
+    // if (numeroMesa == "") return Alert.alert("Debe poner un numero de mesa");
+    // if (numeroPersonas == "")
+    //   return Alert.alert("Debe poner un numero de mesa");
+    // if (numeroBotellas == "")
+    //   return Alert.alert("Debe poner un numero de botellas");
     const newReserva = {
       horaLlegada,
       mesa: numeroMesa,
@@ -180,19 +197,8 @@ const CalendarioScreen = () => {
       diaDeLaReservaCreada: moment(),
       nombreDeLaReserva: nombreReserva,
       reservaDia: diaAddReserva,
+      empresa: user.empresa,
     };
-    // const newReserva = {
-    //   horaLlegada: "23:00",
-    //   mesa: 3,
-    //   numeroPersonas: 7,
-    //   botellas: 2,
-    //   reservaCreadaPor: `${user.nombre} ${user.apellidos}`,
-    //   reservaLlegada: false,
-    //   comentario: "Seguro quieren segrams",
-    //   diaDeLaReservaCreada: moment(),
-    //   nombreDeLaReserva: "Amigos Miguel",
-    //   reservaDia: diaAddReserva,
-    // };
     addReserva(newReserva);
     loadReservas(diaAddReserva);
     loadColorReservas();
@@ -442,7 +448,7 @@ const CalendarioScreen = () => {
   return (
     <BottomSheetModalProvider>
       <ImageBackground
-        source={fondo}
+        source={fondoMostrar}
         resizeMode="cover"
         style={{ flex: 1, justifyContent: "center" }}
       >
@@ -466,6 +472,7 @@ const CalendarioScreen = () => {
             >
               <CalendarPicker
                 onDateChange={(date) => {
+                  console.log(date)
                   handlePresentModal();
                   setPickDay(
                     `${moment(date).format("DD")} ${moment(date).format(

@@ -53,7 +53,7 @@ const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const isFocus = useIsFocused();
   const [asyncData, setAsyncData] = useState(null);
-  const [fondoMostrar, setFondoMostrar] = useState(null)
+  const [fondoMostrar, setFondoMostrar] = useState(null);
 
   const getData = async () => {
     try {
@@ -63,25 +63,24 @@ const HomeScreen = ({ navigation }) => {
         const data = await res.json();
         setAsyncData(data);
         dispatch(addInfoUser(data));
+        console.log(data.empresa);
       }
     } catch (e) {
       // error reading value
       console.log(e);
     }
   };
-  useEffect(()=>{
-    if(user.empresa == "6350346b5e2286c0a43467c4"){
-      setFondoMostrar(fondoPiconera) 
+  useEffect(() => {
+    if (user.empresa == "6350346b5e2286c0a43467c4") {
+      setFondoMostrar(fondoPiconera);
     }
-    if(user.empresa == "635034a45e2286c0a43467c6"){
-      setFondoMostrar(fondoAntique) 
-
+    if (user.empresa == "635034a45e2286c0a43467c6") {
+      setFondoMostrar(fondoAntique);
     }
-    if(user.empresa == "635034ab5e2286c0a43467c8"){
-      setFondoMostrar(fondoRosso) 
-
+    if (user.empresa == "635034ab5e2286c0a43467c8") {
+      setFondoMostrar(fondoRosso);
     }
-  },[])
+  }, [isFocus]);
   useEffect(() => {
     getData();
     return () => {
@@ -214,32 +213,36 @@ const HomeScreen = ({ navigation }) => {
             {user.habilitadoUser == true ? (
               <View style={{ justifyContent: "center", alignItems: "center" }}>
                 <View style={{ flexDirection: "row", marginBottom: 15 }}>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("PickMesaScreen")}
-                  >
-                    <View style={styles.ventanaBoton}>
-                      <Image
-                        source={comanda}
-                        style={{ width: 80, height: 80, borderRadius: 30 }}
-                      />
-                      <View style={styles.ventanaTextBotones}>
-                        <Text style={styles.textBoton}>Nueva Comanda</Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("MesasScreen")}
-                  >
-                    <View style={styles.ventanaBoton}>
-                      <Image
-                        source={mesas}
-                        style={{ width: 80, height: 80, borderRadius: 30 }}
-                      />
-                      <View style={styles.ventanaTextBotones}>
-                        <Text style={styles.textBoton}> Estado Mesas</Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
+                  {(user.rango == "Administrador" || user.rango == "Encargado") && (
+                    <>
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate("PickMesaScreen")}
+                      >
+                        <View style={styles.ventanaBoton}>
+                          <Image
+                            source={comanda}
+                            style={{ width: 80, height: 80, borderRadius: 30 }}
+                          />
+                          <View style={styles.ventanaTextBotones}>
+                            <Text style={styles.textBoton}>Nueva Comanda</Text>
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate("MesasScreen")}
+                      >
+                        <View style={styles.ventanaBoton}>
+                          <Image
+                            source={mesas}
+                            style={{ width: 80, height: 80, borderRadius: 30 }}
+                          />
+                          <View style={styles.ventanaTextBotones}>
+                            <Text style={styles.textBoton}> Estado Mesas</Text>
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                    </>
+                  )}
                   <TouchableOpacity
                     onPress={() => navigation.navigate("CalendarioScreen")}
                   >
@@ -254,47 +257,51 @@ const HomeScreen = ({ navigation }) => {
                     </View>
                   </TouchableOpacity>
                 </View>
-                <View style={{ flexDirection: "row", marginBottom: 15 }}>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("PruebasScreen")}
-                  >
-                    <View style={styles.ventanaBoton}>
-                      <Image
-                        source={agregar}
-                        style={{ width: 80, height: 80, borderRadius: 30 }}
-                      />
-                      <View style={styles.ventanaTextBotones}>
-                        <Text style={styles.textBoton}>Agregar Producto</Text>
+                {(user.rango == "Administrador" || user.rango == "Encargado") && (
+                  <View style={{ flexDirection: "row", marginBottom: 15 }}>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("PruebasScreen")}
+                    >
+                      <View style={styles.ventanaBoton}>
+                        <Image
+                          source={agregar}
+                          style={{ width: 80, height: 80, borderRadius: 30 }}
+                        />
+                        <View style={styles.ventanaTextBotones}>
+                          <Text style={styles.textBoton}>Agregar Producto</Text>
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("AbrirCaja")}
-                  >
-                    <View style={styles.ventanaBoton}>
-                      <Image
-                        source={cajaImg}
-                        style={{ width: 80, height: 80, borderRadius: 15 }}
-                      />
-                      <View style={styles.ventanaTextBotones}>
-                        <Text style={styles.textBoton}>Gestion Caja</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("AbrirCaja")}
+                    >
+                      <View style={styles.ventanaBoton}>
+                        <Image
+                          source={cajaImg}
+                          style={{ width: 80, height: 80, borderRadius: 15 }}
+                        />
+                        <View style={styles.ventanaTextBotones}>
+                          <Text style={styles.textBoton}>Gestion Caja</Text>
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("GestionEmpresaScreen")}
-                  >
-                    <View style={styles.ventanaBoton}>
-                      <Image
-                        source={ajustes}
-                        style={{ width: 80, height: 80, borderRadius: 30 }}
-                      />
-                      <View style={styles.ventanaTextBotones}>
-                        <Text style={styles.textBoton}>Gestion empresa</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate("GestionEmpresaScreen")
+                      }
+                    >
+                      <View style={styles.ventanaBoton}>
+                        <Image
+                          source={ajustes}
+                          style={{ width: 80, height: 80, borderRadius: 30 }}
+                        />
+                        <View style={styles.ventanaTextBotones}>
+                          <Text style={styles.textBoton}>Gestion empresa</Text>
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                </View>
+                    </TouchableOpacity>
+                  </View>
+                )}
                 <View style={{ flexDirection: "row" }}>
                   <TouchableOpacity
                     onPress={() => navigation.navigate("TikadaScreen")}
