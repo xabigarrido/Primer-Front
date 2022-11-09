@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "La Piconera",
+    "name": "Antique-Piconera-Rosso",
     "plugins": [
       [
         "expo-image-picker",
@@ -17,7 +17,7 @@
       ]
     ],
     "slug": "lapiconera",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -39,7 +39,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "buildNumber": "1.0.1"
+      "buildNumber": "1.0.2"
     },
     "android": {
       "package":"com.la.piconera",
