@@ -35,10 +35,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.la.piconera",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
-      },
       "buildNumber": "1.0.2"
     },
     "android": {
